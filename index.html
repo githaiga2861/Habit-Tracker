@@ -15,11 +15,11 @@
 <meta name="msapplication-TileColor" content="#000000">
 <meta name="msapplication-navbutton-color" content="#000000">
 
-<!-- PWA Manifest (inline via data URI) -->
+<!-- PWA Manifest -->
 <link rel="manifest" href="./manifest.json">
 
 <!-- Apple touch icon (green D on black) -->
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23000'/><text x='256' y='340' font-size='320' text-anchor='middle' fill='%2300ff88' font-family='sans-serif' font-weight='bold'>D</text></svg>">
+<link rel="apple-touch-icon" href="./icon-192.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@300;400;600;700;900&display=swap" rel="stylesheet">
@@ -1026,7 +1026,7 @@ function nextQuote() {
   renderQuote();
 }
 
-// ─── NOTIFICATIONS ────────────────────────────────────────────────────────────
+// ─── NOTIFICATIONS (Service Worker based) ────────────────────────────────────
 const NOTIF_SCHEDULES = {
   morning: { hour: 7,  min: 0,  label: '7:00 AM', msg: 'Start strong. Log your day tonight. 💪' },
   midday:  { hour: 13, min: 0,  label: '1:00 PM', msg: 'Midday check — are you winning today? ⚡' },
@@ -1034,7 +1034,7 @@ const NOTIF_SCHEDULES = {
 };
 
 let notifState = loadNotifState();
-let notifTimers = {};
+let swReg = null;
 
 function loadNotifState() {
   try { return JSON.parse(localStorage.getItem('discipline_notif') || '{}'); }
@@ -1054,31 +1054,37 @@ function renderNotifToggles() {
 
 function updateNotifStatus() {
   const el = document.getElementById('notif-status');
+  if (!('Notification' in window)) {
+    el.textContent = 'Notifications not supported in this browser.';
+    el.style.color = 'var(--text-muted)';
+    return;
+  }
   const perm = Notification.permission;
   if (perm === 'denied') {
-    el.textContent = '⚠ Notifications blocked. Enable them in your browser settings to use reminders.';
+    el.textContent = '⚠ Notifications blocked. Go to browser Settings → Site Settings → Notifications → allow this site.';
     el.style.color = 'var(--red)';
   } else if (perm === 'granted') {
     const active = Object.keys(NOTIF_SCHEDULES).filter(k => notifState[k]).length;
     el.textContent = active > 0
-      ? `${active} reminder${active > 1 ? 's' : ''} active. Notifications will fire daily on schedule.`
+      ? `${active} reminder${active > 1 ? 's' : ''} active — fires even when app is closed.`
       : 'Toggle reminders above to stay accountable.';
     el.style.color = 'var(--text-muted)';
   } else {
-    el.textContent = 'Tap a toggle to enable reminders — you\'ll be asked to allow notifications.';
+    el.textContent = 'Tap a toggle to enable reminders. You will be asked to allow notifications.';
     el.style.color = 'var(--text-muted)';
   }
 }
 
 async function toggleNotif(key) {
+  if (!('Notification' in window)) { toast('Not supported in this browser'); return; }
   if (Notification.permission === 'denied') {
-    toast('Notifications blocked — enable in settings');
+    toast('Blocked — enable in browser site settings');
     return;
   }
   if (Notification.permission !== 'granted') {
     const perm = await Notification.requestPermission();
     if (perm !== 'granted') {
-      toast('Permission denied — cannot set reminders');
+      toast('Permission denied');
       updateNotifStatus();
       return;
     }
@@ -1086,53 +1092,42 @@ async function toggleNotif(key) {
   notifState[key] = !notifState[key];
   saveNotifState();
   renderNotifToggles();
-  if (notifState[key]) {
-    scheduleNotif(key);
-    toast(`${NOTIF_SCHEDULES[key].label} reminder ON`);
-  } else {
-    clearScheduledNotif(key);
-    toast(`${NOTIF_SCHEDULES[key].label} reminder OFF`);
-  }
+  postSchedulesToSW();
+  toast(notifState[key]
+    ? `${NOTIF_SCHEDULES[key].label} reminder ON`
+    : `${NOTIF_SCHEDULES[key].label} reminder OFF`
+  );
 }
 
-function scheduleNotif(key) {
-  clearScheduledNotif(key);
-  const { hour, min, msg } = NOTIF_SCHEDULES[key];
-  const now = new Date();
-  const target = new Date();
-  target.setHours(hour, min, 0, 0);
-  if (target <= now) target.setDate(target.getDate() + 1);
-  const delay = target - now;
-
-  notifTimers[key] = setTimeout(() => {
-    if (Notification.permission === 'granted' && notifState[key]) {
-      new Notification('DISCIPLINE', {
-        body: msg,
-        icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23000'/><text x='256' y='340' font-size='320' text-anchor='middle' fill='%2300ff88' font-family='sans-serif' font-weight='bold'>D</text></svg>",
-        badge: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23000'/><text x='256' y='340' font-size='320' text-anchor='middle' fill='%2300ff88' font-family='sans-serif' font-weight='bold'>D</text></svg>",
-        tag: `discipline-${key}`,
-        requireInteraction: false,
-      });
-    }
-    // Reschedule for next day
-    if (notifState[key]) scheduleNotif(key);
-  }, delay);
+// Send active schedules to the Service Worker
+function postSchedulesToSW() {
+  if (!swReg || !swReg.active) return;
+  const active = Object.keys(NOTIF_SCHEDULES)
+    .filter(k => notifState[k])
+    .map(k => ({ key: k, ...NOTIF_SCHEDULES[k] }));
+  swReg.active.postMessage({ type: 'SCHEDULE', schedules: active });
 }
 
-function clearScheduledNotif(key) {
-  if (notifTimers[key]) { clearTimeout(notifTimers[key]); delete notifTimers[key]; }
-}
-
-function initNotifications() {
-  if (!('Notification' in window)) {
-    document.getElementById('notif-status').textContent = 'Notifications not supported in this browser.';
+async function initNotifications() {
+  if (!('serviceWorker' in navigator)) {
+    updateNotifStatus();
     return;
   }
-  renderNotifToggles();
-  // Re-arm any previously enabled reminders
-  Object.keys(NOTIF_SCHEDULES).forEach(key => {
-    if (notifState[key] && Notification.permission === 'granted') scheduleNotif(key);
-  });
+  try {
+    // Register the service worker
+    swReg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+    // Wait for it to be active
+    await navigator.serviceWorker.ready;
+    swReg = await navigator.serviceWorker.ready;
+    renderNotifToggles();
+    // Re-arm if permission already granted
+    if (Notification.permission === 'granted') {
+      postSchedulesToSW();
+    }
+  } catch (err) {
+    console.warn('SW registration failed:', err);
+    updateNotifStatus();
+  }
 }
 
 
