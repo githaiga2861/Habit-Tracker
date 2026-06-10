@@ -2,8 +2,25 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>DISCIPLINE — Daily Command</title>
+
+<!-- PWA / Browser Chrome AMOLED -->
+<meta name="theme-color" content="#000000">
+<meta name="background-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="DISCIPLINE">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="msapplication-TileColor" content="#000000">
+<meta name="msapplication-navbutton-color" content="#000000">
+
+<!-- PWA Manifest (inline via data URI) -->
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22DISCIPLINE%20%E2%80%94%20Daily%20Command%22%2C%22short_name%22%3A%22DISCIPLINE%22%2C%22description%22%3A%22Brutal%20daily%20habit%20tracker.%20Track%20inputs%2C%20not%20outcomes.%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23000000%22%2C%22theme_color%22%3A%22%23000000%22%2C%22orientation%22%3A%22portrait%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%2520viewBox%3D'0%25200%2520512%2520512'%253E%253Crect%2520width%3D'512'%2520height%3D'512'%2520fill%3D'%2523000'%2F%253E%253Ctext%2520x%3D'256'%2520y%3D'340'%2520font-size%3D'320'%2520text-anchor%3D'middle'%2520fill%3D'%252300ff88'%2520font-family%3D'sans-serif'%2520font-weight%3D'bold'%253ED%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+
+<!-- Apple touch icon (green D on black) -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23000'/><text x='256' y='340' font-size='320' text-anchor='middle' fill='%2300ff88' font-family='sans-serif' font-weight='bold'>D</text></svg>">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
@@ -14,11 +31,11 @@
     --surface: #0a0a0a;
     --surface2: #111111;
     --surface3: #1a1a1a;
-    --border: #222222;
-    --border2: #2a2a2a;
-    --text: #f0f0f0;
-    --text-dim: #666666;
-    --text-muted: #333333;
+    --border: #2a2a2a;
+    --border2: #383838;
+    --text: #ffffff;
+    --text-dim: #999999;
+    --text-muted: #555555;
     --green: #00ff88;
     --green-dim: #00a855;
     --red: #ff2244;
@@ -31,7 +48,7 @@
   }
 
   html { background: var(--bg); color: var(--text); font-family: var(--mono); font-size: 14px; }
-  body { min-height: 100vh; padding: 0 0 60px; overflow-x: hidden; }
+  body { min-height: 100vh; padding: 0 0 env(safe-area-inset-bottom, 60px); overflow-x: hidden; padding-bottom: max(60px, env(safe-area-inset-bottom)); }
 
   /* ── HEADER ── */
   #header {
@@ -49,7 +66,7 @@
     color: var(--accent);
     text-transform: uppercase;
   }
-  #date-display { font-size: 11px; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
+  #date-display { font-size: 12px; font-weight: 700; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
 
   /* ── LIFE SCORE HERO ── */
   #life-score-section {
@@ -60,8 +77,8 @@
   }
   #life-score-label {
     font-family: var(--display);
-    font-weight: 300;
-    font-size: 11px;
+    font-weight: 600;
+    font-size: 13px;
     letter-spacing: 5px;
     color: var(--text-dim);
     text-transform: uppercase;
@@ -78,7 +95,7 @@
   #life-score-number.green { color: var(--green); }
   #life-score-number.yellow { color: var(--yellow); }
   #life-score-number.red { color: var(--red); }
-  #life-score-sub { font-size: 11px; color: var(--text-dim); margin-top: 8px; letter-spacing: 2px; }
+  #life-score-sub { font-size: 13px; font-weight: 600; color: var(--text-dim); margin-top: 8px; letter-spacing: 2px; }
 
   /* ── STREAKS ── */
   #streaks-section {
@@ -100,7 +117,8 @@
   }
   .streak-number.zero { color: var(--text-muted); }
   .streak-label {
-    font-size: 9px;
+    font-size: 11px;
+    font-weight: 600;
     color: var(--text-dim);
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -120,7 +138,7 @@
   #today-label {
     font-family: var(--display);
     font-weight: 700;
-    font-size: 13px;
+    font-size: 15px;
     letter-spacing: 4px;
     text-transform: uppercase;
     color: var(--text-dim);
@@ -180,7 +198,7 @@
     color: var(--text);
     line-height: 1;
   }
-  .habit-target { font-size: 10px; color: var(--text-dim); margin-top: 3px; letter-spacing: 1px; }
+  .habit-target { font-size: 12px; font-weight: 600; color: var(--text-dim); margin-top: 3px; letter-spacing: 1px; }
 
   .habit-toggle {
     width: 56px; flex-shrink: 0;
@@ -209,7 +227,7 @@
     color: var(--red);
   }
   .toggle-btn.pending { color: var(--text-muted); }
-  .toggle-btn.pending::before { content: '—'; font-size: 16px; color: var(--text-muted); }
+  .toggle-btn.pending::before { content: '—'; font-size: 16px; color: #555555; }
 
   /* ── GROWTH METRIC ── */
   #growth-section {
@@ -221,7 +239,7 @@
   #growth-label {
     font-family: var(--display);
     font-weight: 700;
-    font-size: 13px;
+    font-size: 15px;
     letter-spacing: 4px;
     text-transform: uppercase;
     color: var(--text-dim);
@@ -246,7 +264,7 @@
     line-height: 1.6;
   }
   #growth-note:focus { border-color: var(--text-dim); }
-  #growth-note::placeholder { color: var(--text-muted); }
+  #growth-note::placeholder { color: #555555; }
   #growth-btns { display: flex; gap: 10px; }
   .growth-btn {
     flex: 1; padding: 14px;
@@ -276,7 +294,7 @@
   #monthly-section { padding: 20px; }
   #monthly-title {
     font-family: var(--display); font-weight: 700;
-    font-size: 13px; letter-spacing: 4px;
+    font-size: 15px; letter-spacing: 4px;
     text-transform: uppercase; color: var(--text-dim);
     margin-bottom: 16px;
   }
@@ -295,7 +313,7 @@
     gap: 4px;
   }
   .cal-header {
-    text-align: center; font-size: 9px; color: var(--text-muted);
+    text-align: center; font-size: 11px; font-weight: 700; color: var(--text-dim);
     letter-spacing: 1px; padding: 4px 0; text-transform: uppercase;
   }
   .cal-day {
@@ -317,7 +335,7 @@
   #history-section { padding: 0 20px 20px; }
   #history-title {
     font-family: var(--display); font-weight: 700;
-    font-size: 13px; letter-spacing: 4px;
+    font-size: 15px; letter-spacing: 4px;
     text-transform: uppercase; color: var(--text-dim);
     padding: 20px 0 14px; border-top: 1px solid var(--border);
   }
@@ -343,9 +361,9 @@
     display: none; flex-wrap: wrap; gap: 6px;
   }
   .history-habits.open { display: flex; }
-  .h-habit { font-size: 10px; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-dim); letter-spacing: 1px; }
+  .h-habit { font-size: 11px; font-weight: 600; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-dim); letter-spacing: 1px; }
   .h-habit.done { border-color: var(--green-dim); color: var(--green); }
-  .history-note { font-size: 11px; color: var(--text-dim); font-style: italic; padding: 0 14px 10px; line-height: 1.5; }
+  .history-note { font-size: 12px; font-weight: 500; color: var(--text-dim); font-style: italic; padding: 0 14px 10px; line-height: 1.5; }
 
   /* ── RESET ZONE ── */
   #reset-zone { padding: 20px; border-top: 1px solid var(--border); text-align: center; }
@@ -371,6 +389,75 @@
   /* ── SEPARATOR ── */
   .section-divider { height: 1px; background: var(--border); margin: 0; }
 
+  /* ── DAILY QUOTE ── */
+  #quote-section {
+    padding: 24px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: relative;
+  }
+  #quote-tag {
+    font-family: var(--display); font-weight: 700; font-size: 10px;
+    letter-spacing: 4px; color: var(--text-muted); text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  #quote-text {
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(18px, 5vw, 24px);
+    line-height: 1.25; color: var(--text);
+    letter-spacing: 0.5px;
+    transition: opacity 0.4s;
+  }
+  #quote-author {
+    font-family: var(--mono); font-size: 11px; font-weight: 700;
+    color: var(--green); letter-spacing: 2px;
+    margin-top: 10px; text-transform: uppercase;
+  }
+  #quote-tap {
+    font-family: var(--mono); font-size: 10px; color: var(--text-muted);
+    letter-spacing: 1px; margin-top: 14px; cursor: pointer;
+    display: inline-block;
+  }
+  #quote-tap:active { color: var(--text-dim); }
+
+  /* ── NOTIFICATIONS ── */
+  #notif-section {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  #notif-title {
+    font-family: var(--display); font-weight: 700;
+    font-size: 15px; letter-spacing: 4px;
+    text-transform: uppercase; color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+  .notif-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .notif-row:last-child { border-bottom: none; }
+  .notif-info { flex: 1; }
+  .notif-name { font-family: var(--display); font-weight: 700; font-size: 15px; letter-spacing: 1px; color: var(--text); }
+  .notif-time { font-size: 12px; font-weight: 600; color: var(--text-dim); margin-top: 2px; letter-spacing: 1px; }
+  .notif-toggle {
+    width: 44px; height: 26px; border-radius: 13px;
+    background: var(--border2); border: none; cursor: pointer;
+    position: relative; transition: background 0.2s;
+    flex-shrink: 0; -webkit-tap-highlight-color: transparent;
+  }
+  .notif-toggle::after {
+    content: ''; position: absolute;
+    top: 3px; left: 3px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--text-muted); transition: all 0.2s;
+  }
+  .notif-toggle.on { background: var(--green); }
+  .notif-toggle.on::after { left: 21px; background: #000; }
+  #notif-status {
+    font-size: 11px; font-weight: 600; color: var(--text-muted);
+    margin-top: 14px; letter-spacing: 1px; line-height: 1.6;
+  }
+
   @media (max-width: 340px) {
     #life-score-number { font-size: 64px; }
     .streak-number { font-size: 36px; }
@@ -393,6 +480,14 @@
   <div id="life-score-label">Life Score — Days Won This Month</div>
   <div id="life-score-number" class="green">—%</div>
   <div id="life-score-sub" id="life-score-detail">— / — days elapsed</div>
+</div>
+
+<!-- DAILY QUOTE -->
+<div id="quote-section">
+  <div id="quote-tag">Today's Fuel</div>
+  <div id="quote-text"></div>
+  <div id="quote-author"></div>
+  <div id="quote-tap" onclick="nextQuote()">tap for next →</div>
 </div>
 
 <!-- STREAKS -->
@@ -458,6 +553,33 @@
 <div id="history-section">
   <div id="history-title">Log History</div>
   <div id="history-list"></div>
+</div>
+
+<!-- NOTIFICATIONS -->
+<div id="notif-section">
+  <div id="notif-title">Daily Reminders</div>
+  <div class="notif-row">
+    <div class="notif-info">
+      <div class="notif-name">Morning Kickoff</div>
+      <div class="notif-time" id="notif-time-morning">7:00 AM — Start your day with intention</div>
+    </div>
+    <button class="notif-toggle" id="toggle-morning" onclick="toggleNotif('morning')"></button>
+  </div>
+  <div class="notif-row">
+    <div class="notif-info">
+      <div class="notif-name">Midday Check</div>
+      <div class="notif-time" id="notif-time-midday">1:00 PM — Are you on track?</div>
+    </div>
+    <button class="notif-toggle" id="toggle-midday" onclick="toggleNotif('midday')"></button>
+  </div>
+  <div class="notif-row">
+    <div class="notif-info">
+      <div class="notif-name">Evening Log</div>
+      <div class="notif-time" id="notif-time-evening">9:00 PM — Log today. No excuses.</div>
+    </div>
+    <button class="notif-toggle" id="toggle-evening" onclick="toggleNotif('evening')"></button>
+  </div>
+  <div id="notif-status"></div>
 </div>
 
 <!-- RESET -->
@@ -845,7 +967,175 @@ function scrollToHistory() {
   document.getElementById('history-section').scrollIntoView({ behavior: 'smooth' });
 }
 
-// ─── RENDER ALL ──────────────────────────────────────────────────────────────
+// ─── QUOTES ──────────────────────────────────────────────────────────────────
+const QUOTES = [
+  { text: "We are what we repeatedly do. Excellence, then, is not an act, but a habit.", author: "Aristotle" },
+  { text: "The secret of your future is hidden in your daily routine.", author: "Mike Murdock" },
+  { text: "Discipline is choosing between what you want now and what you want most.", author: "Abraham Lincoln" },
+  { text: "You will never always be motivated. You have to learn to be disciplined.", author: "Unknown" },
+  { text: "Don't count the days. Make the days count.", author: "Muhammad Ali" },
+  { text: "The pain of discipline is far less than the pain of regret.", author: "Sarah Bombell" },
+  { text: "Your future self is watching you right now through your memories.", author: "Aubrey De Grey" },
+  { text: "What you do every day matters more than what you do once in a while.", author: "Gretchen Rubin" },
+  { text: "The man who moves a mountain begins by carrying away small stones.", author: "Confucius" },
+  { text: "Hard choices, easy life. Easy choices, hard life.", author: "Jerzy Gregorek" },
+  { text: "If you are depressed, you are living in the past. If you are anxious, you are living in the future. If you are at peace, you are living in the present.", author: "Lao Tzu" },
+  { text: "Every action you take is a vote for the type of person you wish to become.", author: "James Clear" },
+  { text: "Don't wish it were easier. Wish you were better.", author: "Jim Rohn" },
+  { text: "The only way out is through.", author: "Robert Frost" },
+  { text: "Motivation gets you started. Discipline keeps you going.", author: "Jim Ryun" },
+  { text: "Suffer the pain of discipline or suffer the pain of regret.", author: "Unknown" },
+  { text: "One day or day one. You decide.", author: "Unknown" },
+  { text: "Do it now. Sometimes 'later' becomes 'never'.", author: "Unknown" },
+  { text: "The strongest people are not those who show strength in front of us, but those who win battles we know nothing about.", author: "Unknown" },
+  { text: "You don't rise to the level of your goals. You fall to the level of your systems.", author: "James Clear" },
+  { text: "Either you run the day or the day runs you.", author: "Jim Rohn" },
+  { text: "It's not about having time. It's about making time.", author: "Unknown" },
+  { text: "Winners are not people who never fail, but people who never quit.", author: "Edwin Louis Cole" },
+  { text: "The difference between who you are and who you want to be is what you do.", author: "Unknown" },
+  { text: "Small daily improvements over time lead to stunning results.", author: "Robin Sharma" },
+  { text: "Be the person your future self will thank.", author: "Unknown" },
+  { text: "You are one decision away from a completely different life.", author: "Mel Robbins" },
+  { text: "Stop being afraid of what could go wrong. Focus on what could go right.", author: "Unknown" },
+  { text: "The cost of not following your heart is spending the rest of your life wishing you had.", author: "Unknown" },
+  { text: "Eat the damn frog first.", author: "Mark Twain" },
+];
+
+let quoteIndex = 0;
+
+function getDailyQuoteIndex() {
+  const d = new Date();
+  const seed = d.getFullYear() * 10000 + (d.getMonth()+1) * 100 + d.getDate();
+  return seed % QUOTES.length;
+}
+
+function renderQuote() {
+  const q = QUOTES[quoteIndex];
+  const el = document.getElementById('quote-text');
+  const au = document.getElementById('quote-author');
+  el.style.opacity = '0';
+  setTimeout(() => {
+    el.textContent = `"${q.text}"`;
+    au.textContent = `— ${q.author}`;
+    el.style.opacity = '1';
+  }, 200);
+}
+
+function nextQuote() {
+  quoteIndex = (quoteIndex + 1) % QUOTES.length;
+  renderQuote();
+}
+
+// ─── NOTIFICATIONS ────────────────────────────────────────────────────────────
+const NOTIF_SCHEDULES = {
+  morning: { hour: 7,  min: 0,  label: '7:00 AM', msg: 'Start strong. Log your day tonight. 💪' },
+  midday:  { hour: 13, min: 0,  label: '1:00 PM', msg: 'Midday check — are you winning today? ⚡' },
+  evening: { hour: 21, min: 0,  label: '9:00 PM', msg: "Day's almost over. Log it. Own it. ✅" },
+};
+
+let notifState = loadNotifState();
+let notifTimers = {};
+
+function loadNotifState() {
+  try { return JSON.parse(localStorage.getItem('discipline_notif') || '{}'); }
+  catch { return {}; }
+}
+function saveNotifState() {
+  localStorage.setItem('discipline_notif', JSON.stringify(notifState));
+}
+
+function renderNotifToggles() {
+  Object.keys(NOTIF_SCHEDULES).forEach(key => {
+    const btn = document.getElementById(`toggle-${key}`);
+    if (btn) btn.className = `notif-toggle${notifState[key] ? ' on' : ''}`;
+  });
+  updateNotifStatus();
+}
+
+function updateNotifStatus() {
+  const el = document.getElementById('notif-status');
+  const perm = Notification.permission;
+  if (perm === 'denied') {
+    el.textContent = '⚠ Notifications blocked. Enable them in your browser settings to use reminders.';
+    el.style.color = 'var(--red)';
+  } else if (perm === 'granted') {
+    const active = Object.keys(NOTIF_SCHEDULES).filter(k => notifState[k]).length;
+    el.textContent = active > 0
+      ? `${active} reminder${active > 1 ? 's' : ''} active. Notifications will fire daily on schedule.`
+      : 'Toggle reminders above to stay accountable.';
+    el.style.color = 'var(--text-muted)';
+  } else {
+    el.textContent = 'Tap a toggle to enable reminders — you\'ll be asked to allow notifications.';
+    el.style.color = 'var(--text-muted)';
+  }
+}
+
+async function toggleNotif(key) {
+  if (Notification.permission === 'denied') {
+    toast('Notifications blocked — enable in settings');
+    return;
+  }
+  if (Notification.permission !== 'granted') {
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') {
+      toast('Permission denied — cannot set reminders');
+      updateNotifStatus();
+      return;
+    }
+  }
+  notifState[key] = !notifState[key];
+  saveNotifState();
+  renderNotifToggles();
+  if (notifState[key]) {
+    scheduleNotif(key);
+    toast(`${NOTIF_SCHEDULES[key].label} reminder ON`);
+  } else {
+    clearScheduledNotif(key);
+    toast(`${NOTIF_SCHEDULES[key].label} reminder OFF`);
+  }
+}
+
+function scheduleNotif(key) {
+  clearScheduledNotif(key);
+  const { hour, min, msg } = NOTIF_SCHEDULES[key];
+  const now = new Date();
+  const target = new Date();
+  target.setHours(hour, min, 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 1);
+  const delay = target - now;
+
+  notifTimers[key] = setTimeout(() => {
+    if (Notification.permission === 'granted' && notifState[key]) {
+      new Notification('DISCIPLINE', {
+        body: msg,
+        icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23000'/><text x='256' y='340' font-size='320' text-anchor='middle' fill='%2300ff88' font-family='sans-serif' font-weight='bold'>D</text></svg>",
+        badge: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%23000'/><text x='256' y='340' font-size='320' text-anchor='middle' fill='%2300ff88' font-family='sans-serif' font-weight='bold'>D</text></svg>",
+        tag: `discipline-${key}`,
+        requireInteraction: false,
+      });
+    }
+    // Reschedule for next day
+    if (notifState[key]) scheduleNotif(key);
+  }, delay);
+}
+
+function clearScheduledNotif(key) {
+  if (notifTimers[key]) { clearTimeout(notifTimers[key]); delete notifTimers[key]; }
+}
+
+function initNotifications() {
+  if (!('Notification' in window)) {
+    document.getElementById('notif-status').textContent = 'Notifications not supported in this browser.';
+    return;
+  }
+  renderNotifToggles();
+  // Re-arm any previously enabled reminders
+  Object.keys(NOTIF_SCHEDULES).forEach(key => {
+    if (notifState[key] && Notification.permission === 'granted') scheduleNotif(key);
+  });
+}
+
+
 function renderAll() {
   renderHeader();
   renderHabits();
@@ -857,7 +1147,10 @@ function renderAll() {
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
+quoteIndex = getDailyQuoteIndex();
+renderQuote();
 renderAll();
+initNotifications();
 
 // Auto-save note on blur
 document.getElementById('growth-note').addEventListener('blur', function() {
@@ -866,6 +1159,52 @@ document.getElementById('growth-note').addEventListener('blur', function() {
   state[todayKey()] = day;
   saveState();
 });
+
+// ─── PWA INSTALL PROMPT ──────────────────────────────────────────────────────
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show install banner after 3s if not already installed
+  setTimeout(() => {
+    if (deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches) {
+      showInstallBanner();
+    }
+  }, 3000);
+});
+
+function showInstallBanner() {
+  const banner = document.createElement('div');
+  banner.id = 'install-banner';
+  banner.style.cssText = `
+    position:fixed; bottom:0; left:0; right:0;
+    background:#111; border-top:1px solid #2a2a2a;
+    padding:16px 20px; display:flex; align-items:center;
+    justify-content:space-between; z-index:999;
+    font-family:'Barlow Condensed',sans-serif;
+  `;
+  banner.innerHTML = `
+    <div>
+      <div style="font-weight:700;font-size:15px;letter-spacing:2px;color:#fff">INSTALL APP</div>
+      <div style="font-size:11px;color:#999;letter-spacing:1px;margin-top:2px">Add to home screen for offline use</div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="document.getElementById('install-banner').remove()" style="background:none;border:1px solid #333;color:#666;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:2px;padding:8px 14px;cursor:pointer">SKIP</button>
+      <button onclick="triggerInstall()" style="background:#00ff88;border:none;color:#000;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:2px;padding:8px 14px;cursor:pointer">INSTALL</button>
+    </div>
+  `;
+  document.body.appendChild(banner);
+}
+
+async function triggerInstall() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  const banner = document.getElementById('install-banner');
+  if (banner) banner.remove();
+  if (outcome === 'accepted') toast('App installed ✓');
+}
 </script>
 </body>
 </html>
