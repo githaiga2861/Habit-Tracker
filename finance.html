@@ -1,0 +1,1706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>FINANCE — Financial Intelligence OS</title>
+
+<!-- PWA / Browser Chrome AMOLED -->
+<meta name="theme-color" content="#000000">
+<meta name="background-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="FINANCE">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="msapplication-TileColor" content="#000000">
+<meta name="msapplication-navbutton-color" content="#000000">
+
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #000000;
+    --surface: #0a0a0a;
+    --surface2: #111111;
+    --surface3: #1a1a1a;
+    --border: #2a2a2a;
+    --border2: #383838;
+    --text: #ffffff;
+    --text-dim: #999999;
+    --text-muted: #555555;
+    --green: #00ff88;
+    --green-dim: #00a855;
+    --red: #ff2244;
+    --red-dim: #8b1324;
+    --yellow: #ffcc00;
+    --yellow-dim: #7a6200;
+    --blue: #00aaff;
+    --purple: #aa66ff;
+    --accent: #ffffff;
+    --mono: 'Space Mono', monospace;
+    --display: 'Barlow Condensed', sans-serif;
+  }
+
+  html { background: var(--bg); color: var(--text); font-family: var(--mono); font-size: 14px; -webkit-text-size-adjust: 100%; }
+  body { background: var(--bg); min-height: 100vh; overflow-x: hidden; padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
+  ::selection { background: var(--green); color: #000; }
+  input, select, textarea, button { font-family: var(--mono); }
+  button { cursor: pointer; }
+  a { color: inherit; }
+
+  /* ── SCROLLBARS ── */
+  ::-webkit-scrollbar { width: 0; height: 0; }
+
+  /* ── HEADER ── */
+  #header { position: sticky; top: 0; z-index: 100; background: var(--bg); border-bottom: 1px solid var(--border); padding: calc(14px + env(safe-area-inset-top)) 16px 12px; }
+  #header-top { display: flex; align-items: center; justify-content: space-between; }
+  #brand { font-family: var(--display); font-weight: 900; font-size: 26px; letter-spacing: 1px; color: var(--text); text-transform: uppercase; }
+  #brand span { color: var(--green); }
+  .nav-pill { font-family: var(--display); font-weight: 700; font-size: 11px; letter-spacing: 2px; text-decoration: none; color: var(--text-dim); border: 1px solid var(--border2); padding: 4px 10px; display: inline-block; }
+  #date-display { font-family: var(--mono); font-size: 11px; color: var(--text-muted); letter-spacing: 1px; margin-top: 6px; text-transform: uppercase; }
+
+  /* ── TITLES ── */
+  .section-title { font-family: var(--display); font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--text-dim); font-size: 13px; margin: 18px 16px 8px; }
+  .sub-label { font-family: var(--mono); font-size: 11px; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase; }
+
+  /* ── CARDS ── */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 0; padding: 16px; margin: 0 0 1px; }
+  .card.flash-save { animation: flashSave 0.6s ease; }
+  .card.flash-del { animation: flashDel 0.4s ease; }
+  @keyframes flashSave { 0% { background: rgba(0,255,136,0.18); } 100% { background: var(--surface); } }
+  @keyframes flashDel { 0% { background: rgba(255,34,68,0.22); } 100% { background: var(--surface); } }
+
+  /* ── VIEWS ── */
+  .view { display: none; padding-bottom: 8px; }
+  .view.active { display: block; }
+
+  /* ── SCORE DISPLAY ── */
+  .score-big { font-family: var(--display); font-weight: 900; font-size: 68px; line-height: 0.9; }
+  .score-unit { font-family: var(--mono); font-size: 11px; letter-spacing: 1px; color: var(--text-dim); text-transform: uppercase; }
+
+  /* ── PROGRESS BARS ── */
+  .pbar { height: 3px; background: var(--border); width: 100%; overflow: hidden; }
+  .pbar > span { display: block; height: 100%; width: 0; transition: width 0.6s ease; }
+  .pbar.tall { height: 6px; }
+
+  /* ── ALERT CARDS ── */
+  .alert { padding: 12px 16px; margin: 0 0 1px; font-size: 12.5px; line-height: 1.45; border-left: 3px solid var(--border2); }
+  .alert.red { background: #1a0000; border-left-color: var(--red); color: #ffb3bf; }
+  .alert.green { background: #0d1a00; border-left-color: var(--green); color: #b3ffd9; }
+  .alert.yellow { background: #1a1500; border-left-color: var(--yellow); color: #ffe9a3; }
+  .alert.pulse { animation: alertPulse 2s ease-in-out infinite; }
+  @keyframes alertPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.62; } }
+  .alert .a-prefix { font-weight: 700; }
+
+  /* ── PILLS / BADGES ── */
+  .badge { font-family: var(--mono); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; border: 1px solid var(--border2); color: var(--text-dim); display: inline-block; }
+  .badge.green { color: var(--green); border-color: var(--green-dim); }
+  .badge.yellow { color: var(--yellow); border-color: var(--yellow-dim); }
+  .badge.red { color: var(--red); border-color: var(--red-dim); }
+  .badge.blue { color: var(--blue); border-color: #075a85; }
+
+  /* ── INPUTS ── */
+  label.fld { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin: 10px 0 4px; }
+  input, select, textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border2); color: var(--text); font-family: var(--mono); font-size: 14px; padding: 12px; border-radius: 0; outline: none; }
+  input:focus, select:focus, textarea:focus { border-color: var(--text-dim); }
+  input::placeholder, textarea::placeholder { color: var(--text-muted); }
+  select { appearance: none; -webkit-appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--text-dim) 50%), linear-gradient(135deg, var(--text-dim) 50%, transparent 50%); background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; padding-right: 30px; }
+  textarea { resize: vertical; min-height: 60px; }
+  input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.6); }
+
+  /* ── BUTTONS ── */
+  .btn { display: inline-block; width: 100%; text-align: center; font-family: var(--display); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 14px; padding: 13px; border: 1px solid var(--border2); background: var(--surface2); color: var(--text); border-radius: 0; transition: transform 0.08s ease; }
+  .btn:active { transform: scale(0.98); }
+  .btn.primary { background: var(--green); color: #000; border-color: var(--green); }
+  .btn.danger { background: transparent; color: var(--red); border-color: var(--red-dim); }
+  .btn.ghost { background: transparent; color: var(--text-dim); }
+  .btn.sm { width: auto; padding: 7px 12px; font-size: 11px; letter-spacing: 1px; }
+  .btn-row { display: flex; gap: 8px; }
+  .btn-row .btn { width: 100%; }
+
+  /* ── FAB ── */
+  #fab { position: fixed; bottom: calc(72px + env(safe-area-inset-bottom)); right: 18px; width: 56px; height: 56px; border-radius: 50%; background: var(--green); color: #000; font-size: 30px; line-height: 56px; text-align: center; border: none; box-shadow: 0 4px 20px rgba(0,255,136,0.3); z-index: 200; font-family: var(--display); font-weight: 700; }
+  #fab:active { transform: scale(0.95); }
+
+  /* ── TAB BAR ── */
+  #tabbar { position: fixed; bottom: 0; left: 0; right: 0; height: calc(56px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); background: #000; border-top: 1px solid var(--border); display: flex; z-index: 150; }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--text-muted); background: none; border: none; height: 56px; }
+  .tab .ic { font-size: 19px; line-height: 1; font-family: var(--display); font-weight: 700; }
+  .tab .lb { font-family: var(--mono); font-size: 9px; letter-spacing: 1px; text-transform: uppercase; opacity: 0; height: 0; transition: opacity 0.15s; }
+  .tab.active { color: var(--green); }
+  .tab.active .lb { opacity: 1; height: auto; }
+
+  /* ── MODAL ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 300; display: none; align-items: flex-end; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #0a0a0a; border-top: 1px solid var(--border2); width: 100%; max-height: 92vh; overflow-y: auto; padding: 18px 16px calc(28px + env(safe-area-inset-bottom)); animation: slideUp 0.3s ease-out; }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .modal-title { font-family: var(--display); font-weight: 900; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; }
+  .modal-close { background: none; border: none; color: var(--text-dim); font-size: 26px; line-height: 1; width: 34px; height: 34px; }
+
+  /* ── SETUP WIZARD ── */
+  #wizard { position: fixed; inset: 0; background: var(--bg); z-index: 400; display: none; flex-direction: column; }
+  #wizard.open { display: flex; }
+  #wiz-progress { display: flex; gap: 4px; padding: calc(16px + env(safe-area-inset-top)) 16px 0; }
+  #wiz-progress > div { flex: 1; height: 4px; background: var(--border); }
+  #wiz-progress > div.done { background: var(--green); }
+  #wiz-progress > div.curr { background: var(--green-dim); }
+  #wiz-body { flex: 1; overflow-y: auto; padding: 8px 16px 16px; }
+  #wiz-step-label { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; color: var(--text-muted); text-transform: uppercase; margin: 18px 0 4px; }
+  #wiz-step-title { font-family: var(--display); font-weight: 900; font-size: 30px; text-transform: uppercase; line-height: 1; margin-bottom: 4px; }
+  #wiz-step-desc { font-size: 12px; color: var(--text-dim); line-height: 1.5; margin-bottom: 14px; }
+  #wiz-foot { padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); display: flex; gap: 8px; }
+  #wiz-foot .btn { width: 100%; }
+
+  /* ── ROWS / KEY-VALUE ── */
+  .kv { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 0; }
+  .kv .k { color: var(--text-dim); font-size: 12px; }
+  .kv .v { font-family: var(--mono); }
+  .row-between { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .mono { font-family: var(--mono); }
+  .dim { color: var(--text-dim); }
+  .muted { color: var(--text-muted); }
+  .green { color: var(--green); }
+  .red { color: var(--red); }
+  .yellow { color: var(--yellow); }
+  .blue { color: var(--blue); }
+  .purple { color: var(--purple); }
+  .tiny { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
+  .nowrap { white-space: nowrap; }
+  .center { text-align: center; }
+
+  /* ── SCORE DOTS ── */
+  .dots { display: inline-flex; gap: 3px; vertical-align: middle; }
+  .dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--border2); display: inline-block; }
+  .dots i.on { background: var(--green); }
+  .dots.health i.on { background: var(--green); }
+  .dots.protein i.on { background: var(--blue); }
+  .dots.satiety i.on { background: var(--yellow); }
+
+  /* ── DONUT (CSS) ── */
+  .donut { width: 150px; height: 150px; border-radius: 50%; margin: 8px auto; position: relative; }
+  .donut::after { content: ''; position: absolute; inset: 26px; border-radius: 50%; background: var(--bg); }
+  .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; }
+
+  /* ── BAR CHART (CSS) ── */
+  .barchart { display: flex; align-items: flex-end; gap: 8px; height: 110px; padding-top: 8px; }
+  .barchart .bcol { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; height: 100%; }
+  .barchart .bfill { width: 100%; background: var(--green-dim); transition: height 0.6s ease; min-height: 2px; }
+  .barchart .blbl { font-size: 9px; color: var(--text-muted); letter-spacing: 0.5px; }
+
+  /* ── SEGMENTED CONTROL ── */
+  .seg { display: flex; border: 1px solid var(--border2); }
+  .seg button { flex: 1; background: var(--surface2); color: var(--text-dim); border: none; padding: 9px 4px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; border-right: 1px solid var(--border2); }
+  .seg button:last-child { border-right: none; }
+  .seg button.on { background: var(--green); color: #000; }
+
+  /* ── HERO STATUS ── */
+  #status-hero { padding: 22px 16px; border-bottom: 1px solid var(--border); cursor: pointer; }
+  #status-amount { font-family: var(--display); font-weight: 900; font-size: 52px; line-height: 0.95; }
+  #mode-chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--display); font-weight: 700; letter-spacing: 2px; font-size: 13px; padding: 5px 12px; border: 1px solid var(--border2); text-transform: uppercase; }
+
+  .empty-note { color: var(--text-muted); font-size: 12px; text-align: center; padding: 18px; line-height: 1.5; }
+  .count-up { font-variant-numeric: tabular-nums; }
+
+  /* meal plan */
+  .meal { border-left: 2px solid var(--green-dim); padding: 4px 0 4px 10px; margin: 6px 0; font-size: 12px; }
+  .meal b { font-family: var(--display); font-weight: 700; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════ HEADER ════════════════ -->
+<div id="header">
+  <div id="header-top">
+    <div id="brand">FIN<span>ANCE</span></div>
+    <a href="./index.html" class="nav-pill">← DISCIPLINE</a>
+  </div>
+  <div id="date-display"></div>
+</div>
+
+<!-- ════════════════ HOME ════════════════ -->
+<div id="view-home" class="view active">
+  <div id="setup-banner"></div>
+  <div id="status-hero">
+    <div class="sub-label">True Available Money</div>
+    <div id="status-amount">KSh 0</div>
+    <div class="sub-label" style="margin-top:4px">After savings &amp; upcoming bills · tap to update cash</div>
+    <div id="cash-stale"></div>
+  </div>
+  <div id="override-banner"></div>
+
+  <div class="section-title">Financial Runway</div>
+  <div class="card" id="runway-card"></div>
+
+  <div class="section-title">Next Income</div>
+  <div id="next-income"></div>
+
+  <div class="section-title">Financial Health</div>
+  <div class="card center" id="health-card"></div>
+
+  <div class="section-title">Decision Engine</div>
+  <div id="decision-engine"></div>
+
+  <div class="section-title">Risk Alerts</div>
+  <div id="risk-alerts"></div>
+</div>
+
+<!-- ════════════════ BUDGET ════════════════ -->
+<div id="view-budget" class="view">
+  <div class="section-title">Income Sources</div>
+  <div id="budget-income"></div>
+  <div class="section-title">Expense Categories</div>
+  <div id="budget-expenses"></div>
+  <div class="section-title">Monthly Summary</div>
+  <div class="card" id="budget-summary"></div>
+  <div style="padding:10px 16px"><button class="btn ghost" onclick="openWizard(0)">EDIT IN SETUP WIZARD</button></div>
+</div>
+
+<!-- ════════════════ FOOD ════════════════ -->
+<div id="view-food" class="view">
+  <div id="food-survival"></div>
+  <div class="section-title">Smart Recommendations</div>
+  <div id="food-recos"></div>
+  <div class="row-between" style="margin:18px 16px 8px">
+    <div class="section-title" style="margin:0">Food Database</div>
+    <button class="btn sm" onclick="openFoodModal()">+ ADD</button>
+  </div>
+  <div style="padding:0 16px 6px">
+    <div class="seg" id="food-sort">
+      <button data-sort="price" class="on">PRICE</button>
+      <button data-sort="health">HEALTH</button>
+      <button data-sort="protein">PROTEIN</button>
+      <button data-sort="satiety">SATIETY</button>
+    </div>
+  </div>
+  <div id="food-list"></div>
+</div>
+
+<!-- ════════════════ SAVINGS ════════════════ -->
+<div id="view-savings" class="view">
+  <div class="section-title">Savings Health</div>
+  <div class="card" id="savings-health"></div>
+  <div class="section-title">Savings Advice</div>
+  <div id="savings-advice"></div>
+  <div class="row-between" style="margin:18px 16px 8px">
+    <div class="section-title" style="margin:0">Goals</div>
+    <button class="btn sm" onclick="openGoalModal()">+ GOAL</button>
+  </div>
+  <div id="savings-goals"></div>
+</div>
+
+<!-- ════════════════ HISTORY ════════════════ -->
+<div id="view-history" class="view">
+  <div class="section-title">Filter</div>
+  <div style="padding:0 16px 6px">
+    <input id="hist-search" placeholder="Search name or notes…" oninput="renderHistory()" style="margin-bottom:8px">
+    <div class="grid2">
+      <select id="hist-type" onchange="renderHistory()"></select>
+      <select id="hist-cat" onchange="renderHistory()"></select>
+    </div>
+  </div>
+  <div class="section-title">Transactions</div>
+  <div id="hist-list"></div>
+  <div class="section-title">Spending Breakdown</div>
+  <div class="card" id="hist-breakdown"></div>
+  <div class="section-title">Weekly Trend</div>
+  <div class="card" id="hist-trend"></div>
+  <div class="section-title">Habits Detected</div>
+  <div id="hist-habits"></div>
+</div>
+
+<!-- ════════════════ FAB + TABBAR ════════════════ -->
+<button id="fab" onclick="openTxnModal()">+</button>
+<nav id="tabbar">
+  <button class="tab active" data-tab="home" onclick="switchTab('home')"><span class="ic">◆</span><span class="lb">Home</span></button>
+  <button class="tab" data-tab="budget" onclick="switchTab('budget')"><span class="ic">▤</span><span class="lb">Budget</span></button>
+  <button class="tab" data-tab="food" onclick="switchTab('food')"><span class="ic">▰</span><span class="lb">Food</span></button>
+  <button class="tab" data-tab="savings" onclick="switchTab('savings')"><span class="ic">▲</span><span class="lb">Savings</span></button>
+  <button class="tab" data-tab="history" onclick="switchTab('history')"><span class="ic">≣</span><span class="lb">History</span></button>
+</nav>
+
+<!-- ════════════════ GENERIC MODAL ════════════════ -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-title">—</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- ════════════════ SETUP WIZARD ════════════════ -->
+<div id="wizard">
+  <div id="wiz-progress"></div>
+  <div id="wiz-body">
+    <div id="wiz-step-label"></div>
+    <div id="wiz-step-title"></div>
+    <div id="wiz-step-desc"></div>
+    <div id="wiz-step-content"></div>
+  </div>
+  <div id="wiz-foot"></div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   FINANCIAL INTELLIGENCE OS — single-file vanilla engine
+   localStorage key: finance_v1
+═══════════════════════════════════════════════════════════════════ */
+
+const LS_KEY = 'finance_v1';
+
+const DEFAULT_STATE = {
+  setup_complete: false,
+  last_updated: null,
+  cash_on_hand: 0,
+  income_sources: [],
+  expense_categories: [],
+  food_database: [],
+  savings_goals: [],
+  priorities: ['survival','health','income','education','savings','comfort','luxury'],
+  transactions: [],
+  pending_decisions: []
+};
+
+let S = load();
+
+function load() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return structuredClone(DEFAULT_STATE);
+    const parsed = JSON.parse(raw);
+    return Object.assign(structuredClone(DEFAULT_STATE), parsed);
+  } catch (e) { return structuredClone(DEFAULT_STATE); }
+}
+function save() {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) {}
+}
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+/* ── FORMAT HELPERS ── */
+function ksh(n) {
+  const v = Math.round(Number(n) || 0);
+  return 'KSh ' + v.toLocaleString('en-US');
+}
+function num(n) { return (Math.round((Number(n)||0)*10)/10).toLocaleString('en-US'); }
+function todayISO() { const d = new Date(); d.setHours(0,0,0,0); return d.toISOString(); }
+function daysUntil(iso) {
+  if (!iso) return null;
+  const t = new Date(iso); t.setHours(0,0,0,0);
+  const now = new Date(); now.setHours(0,0,0,0);
+  return Math.round((t - now) / 86400000);
+}
+function daysSince(iso) {
+  if (!iso) return Infinity;
+  return Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+}
+function monthsBetween(fromIso, toIso) {
+  const a = new Date(fromIso), b = new Date(toIso);
+  const ms = b - a;
+  return Math.max(0.1, ms / (86400000 * 30.44));
+}
+function fmtDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-GB', { day:'2-digit', month:'short' });
+}
+function esc(s) { return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ══════════════════════════════════════════════════════════════════
+   CORE FINANCIAL CALCULATIONS
+═══════════════════════════════════════════════════════════════════ */
+
+function dailyEssentials() {
+  let total = 0;
+  S.expense_categories.forEach(c => {
+    const a = Number(c.budget) || 0;
+    if (c.frequency === 'daily') total += a;
+    else if (c.frequency === 'weekly') total += a / 7;
+    else total += a / 30.44; // monthly
+  });
+  return total;
+}
+
+function monthlyExpenses() {
+  let total = 0;
+  S.expense_categories.forEach(c => {
+    const a = Number(c.budget) || 0;
+    if (c.frequency === 'daily') total += a * 30.44;
+    else if (c.frequency === 'weekly') total += a * 4.345;
+    else total += a;
+  });
+  return total;
+}
+
+function monthlyIncome() {
+  let total = 0;
+  S.income_sources.forEach(i => {
+    const a = Number(i.amount) || 0;
+    if (i.frequency === 'weekly') total += a * 4.345;
+    else if (i.frequency === 'biweekly') total += a * 2.17;
+    else if (i.frequency === 'irregular') total += a; // best-effort monthly-equivalent
+    else total += a; // monthly
+  });
+  return total;
+}
+
+function reservedSavings() {
+  return S.savings_goals.filter(g => !g.paused)
+    .reduce((s, g) => s + (Number(g.monthly_contribution) || 0), 0);
+}
+
+function upcomingBills(withinDays) {
+  const out = [];
+  S.expense_categories.forEach(c => {
+    let due = null;
+    if (c.due_date) due = daysUntil(c.due_date);
+    else if (c.due_day != null && c.due_day !== '') {
+      const now = new Date(); let d = new Date(now.getFullYear(), now.getMonth(), Number(c.due_day));
+      if (d < now) d = new Date(now.getFullYear(), now.getMonth()+1, Number(c.due_day));
+      due = daysUntil(d.toISOString());
+    }
+    if (due != null && due >= 0 && due <= withinDays) {
+      out.push({ id: c.id, name: c.name, amount: Number(c.budget)||0, days: due, priority: c.priority });
+    }
+  });
+  return out.sort((a,b) => a.days - b.days);
+}
+
+function categorySpent(catId, sinceDays = 30) {
+  const cut = Date.now() - sinceDays * 86400000;
+  return S.transactions
+    .filter(t => t.category_id === catId && t.type === 'expense' && new Date(t.date).getTime() >= cut)
+    .reduce((s, t) => s + (Number(t.amount)||0), 0);
+}
+
+function trueAvailable() {
+  const bills = upcomingBills(7).reduce((s, b) => s + b.amount, 0);
+  return (Number(S.cash_on_hand)||0) - reservedSavings() - bills;
+}
+
+function getRunway() {
+  const de = dailyEssentials();
+  if (de <= 0) return 999;
+  return trueAvailable() / de;
+}
+
+function getFinancialMode(ta, de) {
+  const runway = de > 0 ? ta / de : 999;
+  if (runway <= 3) return 'SURVIVAL';
+  if (runway <= 7) return 'PRESERVATION';
+  if (runway <= 14) return 'CAUTION';
+  return 'NORMAL';
+}
+
+function nextIncome() {
+  const upcoming = S.income_sources
+    .map(i => ({ ...i, days: daysUntil(i.next_date) }))
+    .filter(i => i.days != null && i.days >= 0)
+    .sort((a, b) => a.days - b.days);
+  return upcoming[0] || null;
+}
+
+function daysToNextIncome() {
+  const n = nextIncome();
+  return n ? n.days : 999;
+}
+
+/* ── PRIORITY TIER INFERENCE (maps an expense category to a priority label) ── */
+function categoryTier(category) {
+  const name = (category || '').toLowerCase();
+  if (/food|rent|shelter|water|house|grocery|ugali|meal/.test(name)) return 'survival';
+  if (/health|medic|hospital|drug|clinic|gym/.test(name)) return 'health';
+  if (/business|work|tool|income|fuel|transport|data|internet|airtime/.test(name)) return 'income';
+  if (/school|fee|book|course|educat|tuition/.test(name)) return 'education';
+  if (/saving|fund|invest/.test(name)) return 'savings';
+  if (/comfort|clothes|home|furniture/.test(name)) return 'comfort';
+  return 'comfort';
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   DECISION ENGINE
+═══════════════════════════════════════════════════════════════════ */
+
+function evaluatePurchase(item, amount, categoryName) {
+  const ta = trueAvailable();
+  const de = dailyEssentials();
+  const runway = de > 0 ? ta / de : 999;
+  const mode = getFinancialMode(ta, de);
+  const tier = categoryTier(categoryName);
+  const categoryPriority = S.priorities.indexOf(tier);
+  const runwayImpact = de > 0 ? amount / de : 0; // days lost
+  const isEssential = categoryPriority > -1 && categoryPriority < 3;
+
+  let verdict;
+  if (mode === 'SURVIVAL' && !isEssential) verdict = 'CRITICAL_AVOID';
+  else if (mode === 'PRESERVATION' && categoryPriority > 3) verdict = 'AVOID';
+  else if (runwayImpact > 2 && mode === 'CAUTION') verdict = 'DELAY';
+  else if ((ta - amount) / Math.max(de, 0.001) < 7 && mode !== 'NORMAL') verdict = 'AVOID';
+  else if (amount > ta * 0.3) verdict = 'DELAY';
+  else verdict = 'SAFE';
+
+  return { verdict, runwayImpact, mode, ta, runway, daysToIncome: daysToNextIncome() };
+}
+
+function verdictMeta(v) {
+  return ({
+    SAFE:           { icon: '✅', label: 'SAFE TO BUY', cls: 'green' },
+    DELAY:          { icon: '⚠️', label: 'DELAY IF POSSIBLE', cls: 'yellow' },
+    AVOID:          { icon: '🔴', label: 'AVOID', cls: 'red' },
+    CRITICAL_AVOID: { icon: '⛔', label: 'CRITICAL — DO NOT BUY', cls: 'red' }
+  })[v];
+}
+
+function scoreFoodItem(f) {
+  const p = Number(f.price) || 0;
+  if (p <= 0) return 0;
+  return ((Number(f.satiety_score)||0) * 2 + (Number(f.protein_score)||0) * 1.5 + (Number(f.health_score)||0) * 1) / p;
+}
+
+function checkSavingsAlerts() {
+  return S.savings_goals.filter(g => {
+    if (g.paused) return false;
+    const ml = monthsBetween(todayISO(), g.deadline);
+    const required = (Number(g.target) - Number(g.current)) / ml;
+    return required > (Number(g.monthly_contribution) || 0) * 1.2;
+  });
+}
+
+function goalStatus(g) {
+  if (g.paused) return { label: 'PAUSED', cls: '' };
+  const remaining = Math.max(0, Number(g.target) - Number(g.current));
+  const ml = monthsBetween(todayISO(), g.deadline);
+  const required = remaining / ml;
+  const contrib = Number(g.monthly_contribution) || 0;
+  if (remaining <= 0) return { label: 'COMPLETE', cls: 'green' };
+  if (contrib >= required) return { label: 'ON TRACK', cls: 'green' };
+  if (contrib >= required * 0.8) return { label: 'BEHIND', cls: 'yellow' };
+  return { label: 'AT RISK', cls: 'red' };
+}
+
+function calculateHealthScore() {
+  let score = 0;
+  const runway = getRunway();
+  if (runway > 30) score += 25;
+  else if (runway > 14) score += 15;
+  else if (runway > 7) score += 8;
+
+  if (S.savings_goals.length) {
+    const avg = S.savings_goals.reduce((s, g) => {
+      const t = Number(g.target) || 0;
+      return s + (t > 0 ? Math.min(1, Number(g.current) / t) : 0);
+    }, 0) / S.savings_goals.length;
+    score += Math.round(avg * 25);
+  }
+
+  const overBudget = S.expense_categories.filter(c => {
+    const period = c.frequency === 'monthly' ? 30 : c.frequency === 'weekly' ? 7 : 1;
+    return categorySpent(c.id, period) > (Number(c.budget) || 0);
+  }).length;
+  score += Math.max(0, 25 - overBudget * 5);
+
+  const bills = upcomingBills(7);
+  const ta = trueAvailable();
+  const canCover = bills.length === 0 || ta >= 0;
+  score += canCover ? 25 : 0;
+
+  return Math.min(100, Math.max(0, score));
+}
+
+function recentOverrides() {
+  const cut = Date.now() - 7 * 86400000;
+  return S.transactions.filter(t =>
+    t.advice_given && t.advice_followed === false && new Date(t.date).getTime() >= cut
+  ).length;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   TOP PRIORITIES + RISK ALERTS
+═══════════════════════════════════════════════════════════════════ */
+
+function topPriorities() {
+  const out = [];
+  upcomingBills(7).slice(0, 3).forEach(b => {
+    out.push(`${b.name} due in ${b.days} day${b.days===1?'':'s'} — ${ksh(b.amount)}`);
+  });
+  const foodDays = foodRunwayDays();
+  if (foodDays != null && foodDays < 5) out.push(`Food stock low — ~${foodDays} day${foodDays===1?'':'s'} of survival meals in budget`);
+  checkSavingsAlerts().forEach(g => {
+    const pct = Math.round(100 * Number(g.current) / Math.max(1, Number(g.target)));
+    out.push(`${g.name} behind target — ${pct}% saved`);
+  });
+  return out.slice(0, 3);
+}
+
+function foodRunwayDays() {
+  if (!S.food_database.length) return null;
+  const cheapest = [...S.food_database].sort((a,b) => scoreFoodItem(b) - scoreFoodItem(a));
+  const top3 = cheapest.slice(0, 3);
+  if (!top3.length) return null;
+  const perDay = top3.reduce((s, f) => s + (Number(f.price)||0), 0);
+  if (perDay <= 0) return null;
+  const ta = Math.max(0, trueAvailable());
+  return Math.floor(ta / perDay);
+}
+
+function riskAlerts() {
+  const out = [];
+  const ta = trueAvailable();
+  upcomingBills(7).forEach(b => {
+    if (ta < b.amount) {
+      out.push(`${b.name} due in ${b.days} day${b.days===1?'':'s'}. ${ksh(b.amount)} required. You have ${ksh(ta)} available.`);
+    }
+  });
+  const ni = nextIncome();
+  if ((!ni || ni.days > 10) && getRunway() < 10) {
+    out.push(`No income expected for ${ni ? ni.days : 'many'} days. Enter preservation mode.`);
+  }
+  S.savings_goals.forEach(g => {
+    if (g.paused) return;
+    const t = Number(g.target) || 0;
+    const pct = t > 0 ? 100 * Number(g.current) / t : 0;
+    const dd = daysUntil(g.deadline);
+    if (pct < 15 && dd != null && dd < 60) {
+      out.push(`${g.name} critically low. ${Math.round(pct)}% of target with ${dd} days to deadline.`);
+    }
+  });
+  if (ta < 0) out.push(`You are short ${ksh(Math.abs(ta))} against your savings + upcoming bills.`);
+  return out;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════════════════ */
+
+function switchTab(tab) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + tab).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  window.scrollTo(0, 0);
+  renderAll();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   RENDER — ALL
+═══════════════════════════════════════════════════════════════════ */
+
+function renderAll() {
+  renderHeader();
+  renderHome();
+  renderBudget();
+  renderFood();
+  renderSavings();
+  renderHistory();
+}
+
+function renderHeader() {
+  const d = new Date();
+  document.getElementById('date-display').textContent =
+    d.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long' }).toUpperCase();
+}
+
+/* ── HOME ── */
+function renderHome() {
+  // Setup banner
+  const sb = document.getElementById('setup-banner');
+  if (!S.setup_complete) {
+    sb.innerHTML = `<div class="alert red pulse" style="cursor:pointer;border-left-width:3px" onclick="openWizard(0)">
+      <span class="a-prefix">⚠ SETUP INCOMPLETE</span> — YOUR DATA IS INCOMPLETE. TAP TO FINISH.</div>`;
+  } else sb.innerHTML = '';
+
+  // Override banner
+  const ob = document.getElementById('override-banner');
+  if (recentOverrides() >= 3) {
+    ob.innerHTML = `<div class="alert red"><span class="a-prefix">⚠</span> You have ignored financial advice ${recentOverrides()} times this week. Review your decisions.</div>`;
+  } else ob.innerHTML = '';
+
+  // Hero
+  const ta = trueAvailable();
+  const mi = monthlyIncome();
+  const ratio = mi > 0 ? ta / mi : 0;
+  let col = 'var(--red)';
+  if (ratio > 0.5) col = 'var(--green)';
+  else if (ratio >= 0.2) col = 'var(--yellow)';
+  const amtEl = document.getElementById('status-amount');
+  amtEl.style.color = col;
+  amtEl.textContent = ksh(ta);
+
+  const stale = document.getElementById('cash-stale');
+  if (daysSince(S.last_updated) >= 3 && S.setup_complete) {
+    stale.innerHTML = `<div class="tiny yellow" style="margin-top:8px">⚠ Balance may be outdated. Tap to update.</div>`;
+  } else stale.innerHTML = '';
+
+  // Runway
+  const de = dailyEssentials();
+  const runways = [
+    { name: 'CONSERVATIVE', mult: 1.3 },
+    { name: 'NORMAL', mult: 1.0 },
+    { name: 'AGGRESSIVE', mult: 0.7 }
+  ].map(r => {
+    const daily = de * r.mult;
+    const days = daily > 0 ? trueAvailable() / daily : 999;
+    return { ...r, days: Math.max(0, days) };
+  });
+  document.getElementById('runway-card').innerHTML = runways.map(r => {
+    let c = r.days < 7 ? 'var(--red)' : r.days < 14 ? 'var(--yellow)' : 'var(--green)';
+    const pct = Math.min(100, (r.days / 30) * 100);
+    return `<div style="margin-bottom:12px">
+      <div class="row-between" style="margin-bottom:5px">
+        <span class="tiny dim">${r.name}</span>
+        <span class="mono" style="color:${c};font-weight:700">${Math.round(r.days)} days</span>
+      </div>
+      <div class="pbar tall"><span style="width:${pct}%;background:${c}"></span></div>
+    </div>`;
+  }).join('') + (de <= 0 ? `<div class="empty-note">Add expense categories to compute runway.</div>` : '');
+
+  // Next income
+  const ni = nextIncome();
+  const niEl = document.getElementById('next-income');
+  if (ni) {
+    const relCls = ni.reliability === 'guaranteed' ? 'green' : ni.reliability === 'likely' ? 'yellow' : 'red';
+    niEl.innerHTML = `<div class="card">
+      <div class="row-between">
+        <div>
+          <div style="font-family:var(--display);font-weight:700;font-size:18px;letter-spacing:1px">${esc(ni.name)}</div>
+          <div class="mono green" style="font-size:20px">${ksh(ni.amount)}</div>
+        </div>
+        <div class="center">
+          <div class="score-big" style="font-size:40px;color:var(--blue)">${ni.days}</div>
+          <div class="tiny dim">days away</div>
+        </div>
+      </div>
+      <div style="margin-top:8px"><span class="badge ${relCls}">${esc(ni.reliability||'')}</span>
+        <span class="tiny muted" style="margin-left:8px">${fmtDate(ni.next_date)}</span></div>
+    </div>`;
+  } else {
+    niEl.innerHTML = `<div class="card empty-note">No upcoming income scheduled.</div>`;
+  }
+
+  // Health score
+  const hs = calculateHealthScore();
+  let hc = hs >= 80 ? 'var(--green)' : hs >= 50 ? 'var(--yellow)' : 'var(--red)';
+  document.getElementById('health-card').innerHTML = `
+    <div class="score-big count-up" style="color:${hc}" data-target="${hs}">0</div>
+    <div class="score-unit">/ 100 · Financial Health</div>
+    <div class="pbar tall" style="margin-top:12px"><span style="width:${hs}%;background:${hc}"></span></div>`;
+
+  // Decision engine
+  const mode = getFinancialMode(ta, de);
+  const modeMeta = {
+    NORMAL:       { icon:'🟢', txt:'NORMAL MODE', desc:'Spend normally. All obligations covered.', col:'var(--green)' },
+    CAUTION:      { icon:'🟡', txt:'CAUTION MODE', desc:'Avoid optional spending. Bills due soon.', col:'var(--yellow)' },
+    PRESERVATION: { icon:'🔴', txt:'PRESERVATION MODE', desc:'Emergency spending only. Runway under 7 days.', col:'var(--red)' },
+    SURVIVAL:     { icon:'⚫', txt:'SURVIVAL MODE', desc:'Food and shelter only. Runway under 3 days.', col:'var(--red)' }
+  }[mode];
+  const pri = topPriorities();
+  document.getElementById('decision-engine').innerHTML = `
+    <div class="card">
+      <div id="mode-chip" style="color:${modeMeta.col};border-color:${modeMeta.col}">${modeMeta.icon} ${modeMeta.txt}</div>
+      <div style="font-size:12.5px;color:var(--text-dim);margin:10px 0 14px;line-height:1.45">${modeMeta.desc}</div>
+      <div class="tiny dim" style="letter-spacing:2px;margin-bottom:8px">TOP PRIORITIES RIGHT NOW</div>
+      ${pri.length ? pri.map((p,i) => `<div class="kv"><span class="v" style="font-size:12.5px"><span class="green">${i+1}.</span> ${esc(p)}</span></div>`).join('')
+        : `<div class="muted tiny">No pressing priorities. Stay disciplined.</div>`}
+    </div>`;
+
+  // Risk alerts
+  const ra = riskAlerts();
+  document.getElementById('risk-alerts').innerHTML = ra.length
+    ? ra.map(a => `<div class="alert red"><span class="a-prefix">⚠</span> ${esc(a)}</div>`).join('')
+    : `<div class="alert green"><span class="a-prefix">✓</span> No active risk alerts.</div>`;
+
+  animateCounts();
+  animateBars();
+}
+
+/* ── BUDGET ── */
+function renderBudget() {
+  const inc = document.getElementById('budget-income');
+  inc.innerHTML = S.income_sources.length ? S.income_sources.map(i => {
+    const d = daysUntil(i.next_date);
+    const relCls = i.reliability === 'guaranteed' ? 'green' : i.reliability === 'likely' ? 'yellow' : 'red';
+    return `<div class="card">
+      <div class="row-between">
+        <div style="font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:0.5px">${esc(i.name)}</div>
+        <div class="mono green">${ksh(i.amount)}</div>
+      </div>
+      <div class="row-between" style="margin-top:6px">
+        <span class="tiny muted">${esc(i.frequency)} · ${d!=null&&d>=0?d+' days away':'overdue/none'}</span>
+        <span class="badge ${relCls}">${esc(i.reliability||'')}</span>
+      </div>
+      <div class="btn-row" style="margin-top:10px">
+        <button class="btn sm" onclick="markReceived('${i.id}')">MARK RECEIVED</button>
+        <button class="btn sm ghost" onclick="openWizard(0)">EDIT</button>
+      </div>
+    </div>`;
+  }).join('') : `<div class="card empty-note">No income sources. Run setup.</div>`;
+
+  const exp = document.getElementById('budget-expenses');
+  exp.innerHTML = S.expense_categories.length ? S.expense_categories.map(c => {
+    const period = c.frequency === 'monthly' ? 30 : c.frequency === 'weekly' ? 7 : 1;
+    const spent = categorySpent(c.id, period);
+    const budget = Number(c.budget) || 0;
+    const variance = budget - spent;
+    const pct = budget > 0 ? Math.min(100, (spent / budget) * 100) : 0;
+    let stat = variance > budget * 0.1 ? {t:'UNDER BUDGET',c:'var(--green)'} :
+               variance >= 0 ? {t:'AT LIMIT',c:'var(--yellow)'} : {t:'OVER BUDGET',c:'var(--red)'};
+    return `<div class="card">
+      <div class="row-between">
+        <div style="font-family:var(--display);font-weight:700;font-size:16px">${esc(c.name)}</div>
+        <span class="badge" style="color:${stat.c};border-color:${stat.c}">${stat.t}</span>
+      </div>
+      <div class="row-between" style="margin:6px 0">
+        <span class="tiny muted">${esc(c.frequency)} · ${esc(c.priority||'')}</span>
+        <span class="mono tiny">${ksh(spent)} / ${ksh(budget)}</span>
+      </div>
+      <div class="pbar"><span style="width:${pct}%;background:${stat.c}"></span></div>
+    </div>`;
+  }).join('') : `<div class="card empty-note">No expense categories. Run setup.</div>`;
+
+  const mi = monthlyIncome(), me = monthlyExpenses(), ms = reservedSavings();
+  const net = mi - me - ms;
+  document.getElementById('budget-summary').innerHTML = `
+    <div class="kv"><span class="k">Income expected</span><span class="v green">${ksh(mi)}</span></div>
+    <div class="kv"><span class="k">Essential expenses</span><span class="v">${ksh(me)}</span></div>
+    <div class="kv"><span class="k">Savings contributions</span><span class="v blue">${ksh(ms)}</span></div>
+    <div class="kv" style="border-top:1px solid var(--border);margin-top:6px;padding-top:8px">
+      <span class="k" style="color:var(--text)">Net cashflow</span>
+      <span class="v" style="color:${net>=0?'var(--green)':'var(--red)'};font-weight:700;font-size:16px">${ksh(net)}</span></div>`;
+}
+
+/* ── FOOD ── */
+let foodSort = 'price';
+function renderFood() {
+  // Survival engine (only CAUTION / PRESERVATION / SURVIVAL)
+  const de = dailyEssentials();
+  const mode = getFinancialMode(trueAvailable(), de);
+  const surv = document.getElementById('food-survival');
+  if (['CAUTION','PRESERVATION','SURVIVAL'].includes(mode) && S.food_database.length) {
+    surv.innerHTML = renderSurvivalEngine();
+  } else surv.innerHTML = '';
+
+  // Recommendations
+  const recos = document.getElementById('food-recos');
+  if (S.food_database.length) {
+    const byScore = [...S.food_database].sort((a,b) => scoreFoodItem(b) - scoreFoodItem(a)).slice(0,3);
+    const byProtein = [...S.food_database].filter(f=>Number(f.protein_score)>0)
+      .sort((a,b) => (Number(b.protein_score)/Math.max(1,Number(b.price))) - (Number(a.protein_score)/Math.max(1,Number(a.price)))).slice(0,3);
+    recos.innerHTML = `
+      <div class="card">
+        <div class="tiny dim" style="margin-bottom:6px">CHEAPEST · HIGH SATIETY VALUE</div>
+        ${byScore.map(f=>`<div class="kv"><span class="k">${esc(f.name)}</span><span class="v">${ksh(f.price)} · ${esc(f.unit||'')}</span></div>`).join('')||'<div class="muted tiny">—</div>'}
+      </div>
+      <div class="card">
+        <div class="tiny dim" style="margin-bottom:6px">BEST PROTEIN PER SHILLING</div>
+        ${byProtein.length?byProtein.map(f=>`<div class="kv"><span class="k">${esc(f.name)}</span><span class="v blue">P${f.protein_score} · ${ksh(f.price)}</span></div>`).join(''):'<div class="muted tiny">No protein-scored foods yet.</div>'}
+      </div>`;
+  } else {
+    recos.innerHTML = `<div class="card empty-note">Add foods to unlock recommendations.</div>`;
+  }
+
+  // List
+  const list = document.getElementById('food-list');
+  const sorted = [...S.food_database].sort((a,b) => {
+    if (foodSort === 'price') return (Number(a.price)||0) - (Number(b.price)||0);
+    return (Number(b[foodSort+'_score'])||0) - (Number(a[foodSort+'_score'])||0);
+  });
+  list.innerHTML = sorted.length ? sorted.map(f => `
+    <div class="card">
+      <div class="row-between">
+        <div style="font-family:var(--display);font-weight:700;font-size:16px">${esc(f.name)}</div>
+        <div class="mono">${ksh(f.price)}</div>
+      </div>
+      <div class="tiny muted" style="margin:4px 0 8px">${esc(f.unit||'')}</div>
+      <div class="grid3">
+        <div class="tiny dim">H ${dotsHtml(f.health_score,'health')}</div>
+        <div class="tiny dim">P ${dotsHtml(f.protein_score,'protein')}</div>
+        <div class="tiny dim">S ${dotsHtml(f.satiety_score,'satiety')}</div>
+      </div>
+      <div class="btn-row" style="margin-top:10px">
+        <button class="btn sm ghost" onclick="openFoodModal('${f.id}')">EDIT</button>
+        <button class="btn sm danger" onclick="deleteItem('food_database','${f.id}')">DELETE</button>
+      </div>
+    </div>`).join('') : `<div class="card empty-note">No foods yet. Tap ADD to build your database.</div>`;
+}
+
+function dotsHtml(score, kind) {
+  let h = `<span class="dots ${kind}">`;
+  for (let i=1;i<=5;i++) h += `<i class="${i<=(Number(score)||0)?'on':''}"></i>`;
+  return h + '</span>';
+}
+
+function renderSurvivalEngine() {
+  const ta = Math.max(0, trueAvailable());
+  // non-food obligations within 7 days
+  const nonFoodBills = upcomingBills(7).filter(b => categoryTier(b.name) !== 'survival').reduce((s,b)=>s+b.amount,0);
+  const budget = Math.max(0, ta - nonFoodBills);
+  const days = Math.max(1, Math.ceil(getRunway()) || 3);
+  // greedy selection
+  const ranked = [...S.food_database].sort((a,b) => scoreFoodItem(b) - scoreFoodItem(a));
+  let spend = 0; const picks = [];
+  const perDayBudget = budget / days;
+  for (const f of ranked) {
+    if (spend + Number(f.price) <= budget && picks.length < 6) { picks.push(f); spend += Number(f.price); }
+  }
+  const avgHealth = picks.length ? picks.reduce((s,f)=>s+Number(f.health_score||0),0)/picks.length : 0;
+  const avgProt = picks.length ? picks.reduce((s,f)=>s+Number(f.protein_score||0),0)/picks.length : 0;
+  let plan;
+  if (!picks.length || budget < (ranked[0]?Number(ranked[0].price):0)) {
+    plan = `<div class="alert red"><span class="a-prefix">⛔</span> Budget critically low. Cheapest survival option: ${ranked[0]?esc(ranked[0].name)+' — '+ksh(ranked[0].price):'none available'}. Expect nutrition gaps.</div>`;
+  } else {
+    plan = picks.map(f => `<div class="meal"><b>${esc(f.name)}</b> — ${ksh(f.price)} <span class="muted">· ${esc(f.unit||'')}</span></div>`).join('') +
+      `<div class="tiny dim" style="margin-top:8px">Protein: ${avgProt>=3?'Adequate':'Low'} | Health: ${avgHealth>=3?'Good':'Poor'} | Spend: ${ksh(spend)} of ${ksh(budget)}</div>`;
+  }
+  return `<div class="card" style="border-color:var(--yellow-dim)">
+    <div class="tiny" style="color:var(--yellow);letter-spacing:2px;margin-bottom:8px">⚠ FOOD SURVIVAL ENGINE · ${days} DAYS</div>
+    <div class="tiny muted" style="margin-bottom:8px">Food budget ${ksh(budget)} · ~${ksh(perDayBudget)}/day</div>
+    ${plan}
+  </div>`;
+}
+
+/* ── SAVINGS ── */
+function renderSavings() {
+  const totalSaved = S.savings_goals.reduce((s,g)=>s+(Number(g.current)||0),0);
+  const totalTarget = S.savings_goals.reduce((s,g)=>s+(Number(g.target)||0),0);
+  const totalContrib = reservedSavings();
+  const required = S.savings_goals.reduce((s,g)=>{
+    if (g.paused) return s;
+    const ml = monthsBetween(todayISO(), g.deadline);
+    return s + Math.max(0, (Number(g.target)-Number(g.current))/ml);
+  },0);
+  const onPace = totalContrib >= required;
+  document.getElementById('savings-health').innerHTML = `
+    <div class="kv"><span class="k">Total saved</span><span class="v green">${ksh(totalSaved)}</span></div>
+    <div class="kv"><span class="k">Total target</span><span class="v">${ksh(totalTarget)}</span></div>
+    <div class="kv"><span class="k">Monthly contribution</span><span class="v blue">${ksh(totalContrib)}</span></div>
+    <div class="kv"><span class="k">Required to hit deadlines</span><span class="v">${ksh(required)}</span></div>
+    <div class="kv" style="border-top:1px solid var(--border);margin-top:6px;padding-top:8px">
+      <span class="k" style="color:var(--text)">Pace</span>
+      <span class="v" style="color:${onPace?'var(--green)':'var(--red)'};font-weight:700">${onPace?'ON PACE':'BEHIND'}</span></div>
+    <div class="pbar tall" style="margin-top:10px"><span style="width:${totalTarget>0?Math.min(100,100*totalSaved/totalTarget):0}%;background:var(--green)"></span></div>`;
+
+  // Advice
+  const adv = [];
+  S.savings_goals.forEach(g => {
+    if (g.paused) { adv.push({c:'yellow',t:`${g.name} is paused. Resume to keep progress.`}); return; }
+    const ml = monthsBetween(todayISO(), g.deadline);
+    const req = Math.max(0,(Number(g.target)-Number(g.current))/ml);
+    const contrib = Number(g.monthly_contribution)||0;
+    const gap = req - contrib;
+    if (Number(g.current) >= Number(g.target)) adv.push({c:'green',t:`${g.name} fully funded. Well done.`});
+    else if (gap > req*0.01 && gap > 1) adv.push({c:'red',t:`You are ${ksh(gap)}/month behind on ${g.name}. Increase contribution or extend deadline.`});
+    else adv.push({c:'green',t:`${g.name} on track. Keep current pace.`});
+  });
+  document.getElementById('savings-advice').innerHTML = adv.length
+    ? adv.map(a=>`<div class="alert ${a.c}">${esc(a.t)}</div>`).join('')
+    : `<div class="card empty-note">No goals yet.</div>`;
+
+  // Goals
+  document.getElementById('savings-goals').innerHTML = S.savings_goals.length ? S.savings_goals.map(g => {
+    const t = Number(g.target)||0, cur = Number(g.current)||0;
+    const pct = t>0?Math.min(100,Math.round(100*cur/t)):0;
+    const st = goalStatus(g);
+    const contrib = Number(g.monthly_contribution)||0;
+    const remaining = Math.max(0, t-cur);
+    const etaMonths = contrib>0?Math.ceil(remaining/contrib):null;
+    const eta = etaMonths!=null ? new Date(Date.now()+etaMonths*30.44*86400000).toLocaleDateString('en-GB',{month:'short',year:'numeric'}) : '—';
+    const dd = daysUntil(g.deadline);
+    return `<div class="card">
+      <div class="row-between">
+        <div style="font-family:var(--display);font-weight:700;font-size:17px">${esc(g.name)} ${g.paused?'<span class="tiny muted">(paused)</span>':''}</div>
+        <span class="badge ${st.cls}">${st.label}</span>
+      </div>
+      <div class="row-between" style="margin:8px 0 4px">
+        <span class="score-big" style="font-size:34px;color:${st.cls==='red'?'var(--red)':st.cls==='yellow'?'var(--yellow)':'var(--green)'}">${pct}<span style="font-size:16px">%</span></span>
+        <div class="center"><div class="mono tiny">${ksh(cur)} / ${ksh(t)}</div><div class="tiny muted">P${g.priority||'-'} · ${dd!=null?dd+'d to deadline':'—'}</div></div>
+      </div>
+      <div class="pbar tall"><span style="width:${pct}%;background:${st.cls==='red'?'var(--red)':st.cls==='yellow'?'var(--yellow)':'var(--green)'}"></span></div>
+      <div class="row-between" style="margin-top:8px"><span class="tiny muted">${ksh(contrib)}/mo · ETA ${eta}</span></div>
+      <div class="grid3" style="margin-top:10px">
+        <button class="btn sm" onclick="savingsAction('add','${g.id}')">ADD</button>
+        <button class="btn sm ghost" onclick="savingsAction('withdraw','${g.id}')">WITHDRAW</button>
+        <button class="btn sm ghost" onclick="togglePause('${g.id}')">${g.paused?'RESUME':'PAUSE'}</button>
+      </div>
+      <div class="btn-row" style="margin-top:6px">
+        <button class="btn sm ghost" onclick="openGoalModal('${g.id}')">EDIT</button>
+        <button class="btn sm danger" onclick="deleteItem('savings_goals','${g.id}')">DELETE</button>
+      </div>
+    </div>`;
+  }).join('') : `<div class="card empty-note">No savings goals yet. Tap + GOAL.</div>`;
+
+  animateBars();
+}
+
+/* ── HISTORY ── */
+function renderHistory() {
+  // filter dropdowns
+  const typeSel = document.getElementById('hist-type');
+  if (!typeSel.dataset.init) {
+    typeSel.innerHTML = `<option value="">All types</option>` +
+      ['expense','income','savings_deposit','savings_withdrawal','transfer'].map(t=>`<option value="${t}">${t.replace('_',' ')}</option>`).join('');
+    typeSel.dataset.init = '1';
+  }
+  const catSel = document.getElementById('hist-cat');
+  catSel.innerHTML = `<option value="">All categories</option>` +
+    S.expense_categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+
+  const q = (document.getElementById('hist-search').value||'').toLowerCase();
+  const ft = document.getElementById('hist-type').value;
+  const fc = document.getElementById('hist-cat').value;
+
+  let txns = [...S.transactions].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  txns = txns.filter(t => {
+    if (ft && t.type !== ft) return false;
+    if (fc && t.category_id !== fc) return false;
+    if (q && !((t.name||'').toLowerCase().includes(q) || (t.notes||'').toLowerCase().includes(q))) return false;
+    return true;
+  });
+
+  const typeColor = { expense:'var(--red)', income:'var(--green)', savings_deposit:'var(--blue)', savings_withdrawal:'var(--yellow)', transfer:'var(--purple)' };
+  document.getElementById('hist-list').innerHTML = txns.length ? txns.map(t => {
+    const sign = (t.type==='income'||t.type==='savings_withdrawal')?'+':'−';
+    const advTag = t.advice_given ? `<span class="badge ${t.advice_followed===false?'red':'green'}" style="margin-left:6px">${t.advice_followed===false?'OVERRODE':'COMPLIED'}</span>` : '';
+    return `<div class="card" onclick="this.querySelector('.tx-det').style.display=this.querySelector('.tx-det').style.display==='block'?'none':'block'">
+      <div class="row-between">
+        <div><div style="font-family:var(--display);font-weight:700;font-size:15px">${esc(t.name||t.type)}</div>
+          <div class="tiny muted">${fmtDate(t.date)} · ${esc((t.type||'').replace('_',' '))}</div></div>
+        <div class="mono" style="color:${typeColor[t.type]||'var(--text)'};font-weight:700">${sign}${ksh(t.amount)}</div>
+      </div>
+      <div class="tx-det" style="display:none;margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+        ${t.category_id?`<div class="kv"><span class="k">Category</span><span class="v">${esc(catName(t.category_id))}</span></div>`:''}
+        ${t.tag?`<div class="kv"><span class="k">Tag</span><span class="v">${esc(t.tag)}</span></div>`:''}
+        ${t.notes?`<div class="kv"><span class="k">Notes</span><span class="v">${esc(t.notes)}</span></div>`:''}
+        ${t.advice_given?`<div class="kv"><span class="k">Advice</span><span class="v">${esc(t.advice_given)} ${advTag}</span></div>`:''}
+        ${t.override_reason?`<div class="kv"><span class="k">Override reason</span><span class="v">${esc(t.override_reason)}</span></div>`:''}
+        <button class="btn sm danger" style="margin-top:8px" onclick="event.stopPropagation();deleteItem('transactions','${t.id}')">DELETE</button>
+      </div>
+    </div>`;
+  }).join('') : `<div class="card empty-note">No transactions yet. Use the + button.</div>`;
+
+  renderBreakdown();
+  renderTrend();
+  renderHabits();
+}
+
+function catName(id) {
+  const c = S.expense_categories.find(c=>c.id===id);
+  return c ? c.name : 'Uncategorized';
+}
+
+function renderBreakdown() {
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  const exp = S.transactions.filter(t=>t.type==='expense' && new Date(t.date).getTime()>=monthStart);
+  const total = exp.reduce((s,t)=>s+(Number(t.amount)||0),0);
+  const el = document.getElementById('hist-breakdown');
+  if (!total) { el.innerHTML = `<div class="empty-note">No spending this month.</div>`; return; }
+  const byCat = {};
+  exp.forEach(t => { const k = t.category_id || 'other'; byCat[k] = (byCat[k]||0) + Number(t.amount); });
+  const palette = ['#00ff88','#00aaff','#ffcc00','#aa66ff','#ff2244','#00a855','#7a6200'];
+  const entries = Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+  let acc = 0; const stops = [];
+  entries.forEach(([k,v],i) => {
+    const start = (acc/total)*360; acc += v; const end = (acc/total)*360;
+    stops.push(`${palette[i%palette.length]} ${start}deg ${end}deg`);
+  });
+  el.innerHTML = `
+    <div class="donut" style="background:conic-gradient(${stops.join(',')})">
+      <div class="donut-center"><div class="score-big" style="font-size:22px">${ksh(total)}</div><div class="tiny muted">this month</div></div>
+    </div>
+    ${entries.map(([k,v],i)=>`<div class="kv">
+      <span class="k"><span style="display:inline-block;width:9px;height:9px;background:${palette[i%palette.length]};margin-right:6px"></span>${esc(catName(k==='other'?null:k))}</span>
+      <span class="v">${ksh(v)} · ${Math.round(100*v/total)}%</span></div>`).join('')}`;
+}
+
+function renderTrend() {
+  const el = document.getElementById('hist-trend');
+  const weeks = [];
+  for (let w=3; w>=0; w--) {
+    const end = Date.now() - w*7*86400000;
+    const start = end - 7*86400000;
+    const txns = S.transactions.filter(t => { const d=new Date(t.date).getTime(); return d>=start && d<end; });
+    const spend = txns.filter(t=>t.type==='expense').reduce((s,t)=>s+Number(t.amount),0);
+    const income = txns.filter(t=>t.type==='income').reduce((s,t)=>s+Number(t.amount),0);
+    weeks.push({ label:'W-'+w, spend, income, net: income-spend });
+  }
+  const max = Math.max(1, ...weeks.map(w=>Math.max(w.spend,w.income)));
+  el.innerHTML = `
+    <div class="barchart">
+      ${weeks.map(w=>`<div class="bcol">
+        <div class="mono tiny" style="color:var(--red)">${w.spend?Math.round(w.spend/1000)+'k':''}</div>
+        <div class="bfill" style="height:${(w.spend/max)*100}%;background:var(--red-dim)"></div>
+        <div class="blbl">${w.label}</div>
+      </div>`).join('')}
+    </div>
+    <div class="kv" style="margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+      <span class="k">This week net</span>
+      <span class="v" style="color:${weeks[3].net>=0?'var(--green)':'var(--red)'}">${ksh(weeks[3].net)}</span></div>`;
+}
+
+function renderHabits() {
+  const habits = [];
+  // overspend on a category multiple weeks
+  S.expense_categories.forEach(c => {
+    let overWeeks = 0;
+    for (let w=0;w<3;w++){
+      const end = Date.now()-w*7*86400000, start=end-7*86400000;
+      const spent = S.transactions.filter(t=>t.category_id===c.id && t.type==='expense' && new Date(t.date).getTime()>=start && new Date(t.date).getTime()<end).reduce((s,t)=>s+Number(t.amount),0);
+      const wk = c.frequency==='monthly'?Number(c.budget)/4.345:c.frequency==='weekly'?Number(c.budget):Number(c.budget)*7;
+      if (spent > wk) overWeeks++;
+    }
+    if (overWeeks >= 2) habits.push(`You overspent on ${c.name} ${overWeeks} of the last 3 weeks.`);
+  });
+  const ov = recentOverrides();
+  if (ov >= 1) habits.push(`You overrode financial advice ${ov} time${ov===1?'':'s'} recently.`);
+  const month = new Date(); const ms = new Date(month.getFullYear(),month.getMonth(),1).getTime();
+  const deposits = S.transactions.filter(t=>t.type==='savings_deposit' && new Date(t.date).getTime()>=ms).length;
+  if (!deposits) habits.push('No savings deposits made this month.');
+  // income consistency
+  const incCount = S.transactions.filter(t=>t.type==='income' && new Date(t.date).getTime()>=Date.now()-28*86400000).length;
+  if (incCount >= 4) habits.push('Income has been consistent for 4 weeks. Good reliability.');
+
+  const el = document.getElementById('hist-habits');
+  el.innerHTML = habits.length ? habits.map(h=>`<div class="alert yellow">${esc(h)}</div>`).join('')
+    : `<div class="card empty-note">Not enough history to detect patterns yet.</div>`;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════════════════════════ */
+function animateCounts() {
+  document.querySelectorAll('.count-up').forEach(el => {
+    const target = Number(el.dataset.target)||0;
+    if (el.dataset.done) { el.textContent = target; return; }
+    el.dataset.done = '1';
+    const start = performance.now(), dur = 800;
+    function step(now){
+      const p = Math.min(1,(now-start)/dur);
+      el.textContent = Math.round(target*(1-Math.pow(1-p,3)));
+      if (p<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+}
+function animateBars() {
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.pbar > span').forEach(s => {
+      const w = s.style.width; s.style.width = '0';
+      requestAnimationFrame(() => { s.style.width = w; });
+    });
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   GENERIC MODAL
+═══════════════════════════════════════════════════════════════════ */
+function openModal(title, html) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+
+/* ── CASH ON HAND UPDATE ── */
+document.getElementById('status-hero').addEventListener('click', () => {
+  openModal('Update Cash', `
+    <label class="fld">Cash on hand (KSh)</label>
+    <input id="m-cash" type="number" inputmode="numeric" value="${Number(S.cash_on_hand)||0}">
+    <div style="height:14px"></div>
+    <button class="btn primary" onclick="saveCash()">SAVE BALANCE</button>`);
+  setTimeout(()=>document.getElementById('m-cash').select(),100);
+});
+function saveCash() {
+  S.cash_on_hand = Number(document.getElementById('m-cash').value)||0;
+  S.last_updated = new Date().toISOString();
+  save(); closeModal(); renderAll();
+}
+
+/* ── DELETE / PAUSE ── */
+function deleteItem(arr, id) {
+  S[arr] = S[arr].filter(x => x.id !== id);
+  save(); renderAll();
+}
+function togglePause(id) {
+  const g = S.savings_goals.find(g=>g.id===id);
+  if (g) { g.paused = !g.paused; save(); renderSavings(); renderHome(); }
+}
+
+/* ── FOOD MODAL ── */
+function openFoodModal(id) {
+  const f = id ? S.food_database.find(x=>x.id===id) : {};
+  openModal(id?'Edit Food':'Add Food', `
+    <label class="fld">Name</label><input id="f-name" value="${esc(f.name||'')}">
+    <div class="grid2">
+      <div><label class="fld">Price (KSh)</label><input id="f-price" type="number" inputmode="numeric" value="${f.price||''}"></div>
+      <div><label class="fld">Unit</label><input id="f-unit" value="${esc(f.unit||'')}" placeholder="1 egg, 500g"></div>
+    </div>
+    <label class="fld">Health (1-5)</label><input id="f-health" type="number" min="1" max="5" value="${f.health_score||3}">
+    <label class="fld">Protein (1-5)</label><input id="f-protein" type="number" min="1" max="5" value="${f.protein_score||3}">
+    <label class="fld">Satiety (1-5)</label><input id="f-satiety" type="number" min="1" max="5" value="${f.satiety_score||3}">
+    <label class="fld">Notes</label><textarea id="f-notes">${esc(f.notes||'')}</textarea>
+    <div style="height:14px"></div>
+    <button class="btn primary" onclick="saveFood('${id||''}')">SAVE</button>`);
+}
+function saveFood(id) {
+  const obj = {
+    id: id || uid(),
+    name: document.getElementById('f-name').value.trim() || 'Food',
+    price: Number(document.getElementById('f-price').value)||0,
+    unit: document.getElementById('f-unit').value.trim(),
+    health_score: clamp5(document.getElementById('f-health').value),
+    protein_score: clamp5(document.getElementById('f-protein').value),
+    satiety_score: clamp5(document.getElementById('f-satiety').value),
+    notes: document.getElementById('f-notes').value.trim()
+  };
+  if (id) { const i = S.food_database.findIndex(x=>x.id===id); S.food_database[i]=obj; }
+  else S.food_database.push(obj);
+  save(); closeModal(); renderFood();
+}
+function clamp5(v){ return Math.max(1,Math.min(5,Number(v)||1)); }
+
+/* ── GOAL MODAL ── */
+function openGoalModal(id) {
+  const g = id ? S.savings_goals.find(x=>x.id===id) : {};
+  openModal(id?'Edit Goal':'New Goal', `
+    <label class="fld">Name</label><input id="g-name" value="${esc(g.name||'')}" placeholder="Emergency Fund">
+    <div class="grid2">
+      <div><label class="fld">Target (KSh)</label><input id="g-target" type="number" inputmode="numeric" value="${g.target||''}"></div>
+      <div><label class="fld">Current (KSh)</label><input id="g-current" type="number" inputmode="numeric" value="${g.current||''}"></div>
+    </div>
+    <div class="grid2">
+      <div><label class="fld">Monthly (KSh)</label><input id="g-monthly" type="number" inputmode="numeric" value="${g.monthly_contribution||''}"></div>
+      <div><label class="fld">Priority 1-5</label><input id="g-priority" type="number" min="1" max="5" value="${g.priority||3}"></div>
+    </div>
+    <label class="fld">Deadline</label><input id="g-deadline" type="date" value="${g.deadline?g.deadline.slice(0,10):''}">
+    <div style="height:14px"></div>
+    <button class="btn primary" onclick="saveGoal('${id||''}')">SAVE</button>`);
+}
+function saveGoal(id) {
+  const dl = document.getElementById('g-deadline').value;
+  const obj = {
+    id: id || uid(),
+    name: document.getElementById('g-name').value.trim()||'Goal',
+    target: Number(document.getElementById('g-target').value)||0,
+    current: Number(document.getElementById('g-current').value)||0,
+    monthly_contribution: Number(document.getElementById('g-monthly').value)||0,
+    deadline: dl ? new Date(dl).toISOString() : new Date(Date.now()+180*86400000).toISOString(),
+    priority: Math.max(1,Math.min(5,Number(document.getElementById('g-priority').value)||3)),
+    paused: id ? (S.savings_goals.find(x=>x.id===id)||{}).paused||false : false
+  };
+  if (id) { const i=S.savings_goals.findIndex(x=>x.id===id); S.savings_goals[i]=obj; }
+  else S.savings_goals.push(obj);
+  save(); closeModal(); renderSavings(); renderHome();
+}
+
+/* ── SAVINGS ADD / WITHDRAW ── */
+function savingsAction(action, id) {
+  const g = S.savings_goals.find(x=>x.id===id); if (!g) return;
+  const isWith = action==='withdraw';
+  openModal(isWith?'Withdraw':'Add to '+g.name, `
+    <label class="fld">Amount (KSh)</label><input id="sa-amt" type="number" inputmode="numeric">
+    ${isWith?`<label class="fld">Reason (required)</label><input id="sa-reason" placeholder="Why withdraw?">`:''}
+    <div style="height:14px"></div>
+    <button class="btn primary" onclick="confirmSavings('${action}','${id}')">${isWith?'CONFIRM WITHDRAWAL':'ADD'}</button>`);
+}
+function confirmSavings(action, id) {
+  const g = S.savings_goals.find(x=>x.id===id); if (!g) return;
+  const amt = Number(document.getElementById('sa-amt').value)||0;
+  if (amt<=0) return;
+  if (action==='withdraw') {
+    const reason = document.getElementById('sa-reason').value.trim();
+    if (!reason) { alert('Reason required to withdraw.'); return; }
+    g.current = Math.max(0, Number(g.current)-amt);
+    S.cash_on_hand = (Number(S.cash_on_hand)||0) + amt;
+    addTxn({ type:'savings_withdrawal', amount:amt, name:'Withdraw: '+g.name, notes:reason });
+  } else {
+    g.current = Number(g.current)+amt;
+    S.cash_on_hand = Math.max(0,(Number(S.cash_on_hand)||0) - amt);
+    addTxn({ type:'savings_deposit', amount:amt, name:'Deposit: '+g.name });
+  }
+  S.last_updated = new Date().toISOString();
+  save(); closeModal(); renderAll();
+}
+
+/* ── MARK INCOME RECEIVED ── */
+function markReceived(id) {
+  const i = S.income_sources.find(x=>x.id===id); if (!i) return;
+  S.cash_on_hand = (Number(S.cash_on_hand)||0) + (Number(i.amount)||0);
+  // advance next date
+  if (i.next_date) {
+    const d = new Date(i.next_date);
+    const add = i.frequency==='weekly'?7:i.frequency==='biweekly'?14:i.frequency==='monthly'?30:30;
+    d.setDate(d.getDate()+add); i.next_date = d.toISOString();
+  }
+  S.last_updated = new Date().toISOString();
+  addTxn({ type:'income', amount:Number(i.amount)||0, name:'Income: '+i.name });
+  save(); renderAll();
+}
+
+function addTxn(t) {
+  S.transactions.push(Object.assign({
+    id: uid(), date: new Date().toISOString(), type:'expense', amount:0,
+    category_id:null, name:'', notes:'', tag:'', advice_given:null, advice_followed:null, override_reason:null
+  }, t));
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   TRANSACTION MODAL — TWO PHASE
+═══════════════════════════════════════════════════════════════════ */
+let txnDraft = {};
+function openTxnModal() {
+  txnDraft = {};
+  openModal('New Transaction', `
+    <div class="tiny dim" style="margin-bottom:10px;letter-spacing:1px">WHAT IS THIS?</div>
+    <button class="btn" style="margin-bottom:8px;text-align:left;padding:16px" onclick="txnPlanning()">
+      <div style="color:var(--green)">PLANNING A PURCHASE</div>
+      <div class="tiny muted" style="font-family:var(--mono);font-weight:400;letter-spacing:0">Tap to get advice first</div>
+    </button>
+    <button class="btn" style="text-align:left;padding:16px" onclick="txnSpent()">
+      <div>ALREADY SPENT IT</div>
+      <div class="tiny muted" style="font-family:var(--mono);font-weight:400;letter-spacing:0">Tap to log what happened</div>
+    </button>`);
+}
+
+function catOptions(sel) {
+  return S.expense_categories.map(c=>`<option value="${c.id}" ${sel===c.id?'selected':''}>${esc(c.name)}</option>`).join('') +
+    `<option value="__custom">+ Custom / other</option>`;
+}
+
+function txnPlanning() {
+  openModal('Plan Purchase', `
+    <label class="fld">Item</label><input id="t-item" placeholder="What are you buying?">
+    <label class="fld">Amount (KSh)</label><input id="t-amount" type="number" inputmode="numeric">
+    <label class="fld">Category</label><select id="t-cat">${catOptions()}</select>
+    <div style="height:14px"></div>
+    <button class="btn primary" onclick="runEvaluation()">EVALUATE</button>`);
+}
+
+function runEvaluation() {
+  const item = document.getElementById('t-item').value.trim()||'Purchase';
+  const amount = Number(document.getElementById('t-amount').value)||0;
+  const catId = document.getElementById('t-cat').value;
+  const catNm = catId==='__custom' ? item : catName(catId);
+  const r = evaluatePurchase(item, amount, catNm);
+  const m = verdictMeta(r.verdict);
+  txnDraft = { item, amount, catId: catId==='__custom'?null:catId, verdict:r.verdict, catNm };
+
+  let detail = '';
+  if (r.verdict==='SAFE') detail = 'This purchase is within budget. It will not significantly impact savings or runway.';
+  else if (r.verdict==='DELAY') detail = `You have ${r.daysToIncome} days until next income. This costs roughly ${num(r.runwayImpact)} days of runway. Delay if possible.`;
+  else if (r.verdict==='AVOID') detail = 'This would drop your runway below 7 days. Not recommended.';
+  else detail = 'You are in survival mode. This purchase is not essential.';
+
+  openModal('Verdict', `
+    <div class="alert ${m.cls}" style="font-size:14px"><span class="a-prefix">${m.icon} ${m.label}</span></div>
+    <div style="font-size:13px;color:var(--text-dim);line-height:1.5;margin:12px 0 6px">${detail}</div>
+    <div class="card" style="margin:8px 0">
+      <div class="kv"><span class="k">Amount</span><span class="v">${ksh(amount)}</span></div>
+      <div class="kv"><span class="k">True available after</span><span class="v">${ksh(r.ta-amount)}</span></div>
+      <div class="kv"><span class="k">Runway impact</span><span class="v">${num(r.runwayImpact)} days</span></div>
+    </div>
+    <div class="tiny dim" style="margin:14px 0 8px;letter-spacing:1px">DID YOU FOLLOW THIS ADVICE?</div>
+    <button class="btn primary" style="margin-bottom:8px" onclick="resolvePlan('yes')">YES — I FOLLOWED IT</button>
+    <button class="btn danger" style="margin-bottom:8px" onclick="resolvePlan('no')">NO — I BOUGHT IT ANYWAY</button>
+    <button class="btn ghost" onclick="resolvePlan('later')">NOT YET — I'LL DECIDE LATER</button>`);
+}
+
+function resolvePlan(choice) {
+  const adviceSafe = txnDraft.verdict==='SAFE';
+  if (choice==='later') {
+    S.pending_decisions.push({ id:uid(), created:new Date().toISOString(), item:txnDraft.item, amount:txnDraft.amount, category_id:txnDraft.catId, advice:txnDraft.verdict });
+    save(); closeModal(); renderHome(); return;
+  }
+  if (choice==='yes' && !adviceSafe) {
+    // followed advice = did NOT buy (advice was to avoid/delay). Log nothing, just record compliance via pending->resolved.
+    closeModal(); renderHome(); return;
+  }
+  if (choice==='no') {
+    openModal('Logged Override', `
+      <div class="tiny dim" style="margin-bottom:8px">Amount actually spent</div>
+      <input id="ov-amt" type="number" inputmode="numeric" value="${txnDraft.amount}">
+      <label class="fld">Override reason (optional)</label><input id="ov-reason" placeholder="Why did you proceed?">
+      <div style="height:14px"></div>
+      <button class="btn primary" onclick="commitTxn(true)">SAVE TRANSACTION</button>`);
+    return;
+  }
+  // yes + safe → bought as advised
+  commitTxn(false);
+}
+
+function commitTxn(override) {
+  const amt = override ? (Number(document.getElementById('ov-amt').value)||txnDraft.amount) : txnDraft.amount;
+  addTxn({
+    type:'expense', amount:amt, name:txnDraft.item, category_id:txnDraft.catId,
+    advice_given: txnDraft.verdict,
+    advice_followed: !override,
+    override_reason: override ? (document.getElementById('ov-reason').value.trim()||null) : null
+  });
+  S.cash_on_hand = Math.max(0,(Number(S.cash_on_hand)||0) - amt);
+  S.last_updated = new Date().toISOString();
+  save(); closeModal(); renderAll();
+}
+
+function txnSpent() {
+  openModal('Log Spending', `
+    <label class="fld">Type</label>
+    <select id="t-type">
+      <option value="expense">Expense</option>
+      <option value="income">Income received</option>
+      <option value="savings_deposit">Savings deposit</option>
+      <option value="savings_withdrawal">Savings withdrawal</option>
+      <option value="transfer">Transfer</option>
+    </select>
+    <label class="fld">What</label><input id="t-name" placeholder="Description">
+    <label class="fld">Amount (KSh)</label><input id="t-amount" type="number" inputmode="numeric">
+    <label class="fld">Category</label><select id="t-cat">${catOptions()}</select>
+    <label class="fld">Date</label><input id="t-date" type="date" value="${new Date().toISOString().slice(0,10)}">
+    <label class="fld">Tag (optional)</label><input id="t-tag">
+    <label class="fld">Notes (optional)</label><textarea id="t-notes"></textarea>
+    <div style="height:14px"></div>
+    <button class="btn primary" onclick="commitSpent()">LOG IT</button>`);
+}
+
+function commitSpent() {
+  const type = document.getElementById('t-type').value;
+  const amount = Number(document.getElementById('t-amount').value)||0;
+  const catId = document.getElementById('t-cat').value;
+  const dateV = document.getElementById('t-date').value;
+  addTxn({
+    type, amount, name: document.getElementById('t-name').value.trim()||type,
+    category_id: catId==='__custom'?null:catId,
+    date: dateV ? new Date(dateV).toISOString() : new Date().toISOString(),
+    tag: document.getElementById('t-tag').value.trim(),
+    notes: document.getElementById('t-notes').value.trim()
+  });
+  // cash impact
+  const before = trueAvailable();
+  if (type==='income'||type==='savings_withdrawal') S.cash_on_hand = (Number(S.cash_on_hand)||0)+amount;
+  else if (type==='expense'||type==='savings_deposit') S.cash_on_hand = Math.max(0,(Number(S.cash_on_hand)||0)-amount);
+  S.last_updated = new Date().toISOString();
+  save();
+  const after = trueAvailable();
+  const de = dailyEssentials();
+  const rwHrs = de>0 ? Math.round((before-after)/de*24) : 0;
+  closeModal();
+  openModal('Logged', `
+    <div class="alert green"><span class="a-prefix">✓</span> You logged ${ksh(amount)}.</div>
+    <div style="font-size:13px;color:var(--text-dim);margin:12px 0;line-height:1.5">
+      ${type==='expense'?`Runway reduced by ~${Math.abs(rwHrs)} hours.`:'Balance updated.'} True available money is now ${ksh(after)}.</div>
+    <button class="btn primary" onclick="closeModal();renderAll()">DONE</button>`);
+  renderAll();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SETUP WIZARD
+═══════════════════════════════════════════════════════════════════ */
+let wizStep = 0;
+const WIZ_STEPS = [
+  { label:'STEP 1 OF 6', title:'Income Sources', desc:'Where does your money come from? Add every source. At least one required.' },
+  { label:'STEP 2 OF 6', title:'Essential Expenses', desc:'What must you pay? Edit the defaults or add your own.' },
+  { label:'STEP 3 OF 6', title:'Savings Goals', desc:'What are you saving toward? Optional but recommended.' },
+  { label:'STEP 4 OF 6', title:'Food Database', desc:'Build your food list. The survival engine uses this.' },
+  { label:'STEP 5 OF 6', title:'Financial Priorities', desc:'Rank what matters when money is tight. Drives the decision engine.' },
+  { label:'STEP 6 OF 6', title:'Summary', desc:'Review everything, then complete setup.' }
+];
+
+function openWizard(step) {
+  // ensure default expense categories on first open
+  if (!S.expense_categories.length && !S._wizSeeded) {
+    S._wizSeeded = true;
+    ['Food','Rent','Internet','Transport','School'].forEach((n,i) =>
+      S.expense_categories.push({ id:uid(), name:n, budget:0, frequency:'monthly', due_day:null, due_date:null, priority:'critical', order:i }));
+  }
+  wizStep = step||0;
+  document.getElementById('wizard').classList.add('open');
+  renderWizard();
+}
+function closeWizard() { document.getElementById('wizard').classList.remove('open'); save(); renderAll(); }
+
+function renderWizard() {
+  const prog = document.getElementById('wiz-progress');
+  prog.innerHTML = WIZ_STEPS.map((_,i)=>`<div class="${i<wizStep?'done':i===wizStep?'curr':''}"></div>`).join('');
+  const s = WIZ_STEPS[wizStep];
+  document.getElementById('wiz-step-label').textContent = s.label;
+  document.getElementById('wiz-step-title').textContent = s.title;
+  document.getElementById('wiz-step-desc').textContent = s.desc;
+  document.getElementById('wiz-step-content').innerHTML = [wizIncome,wizExpense,wizSavings,wizFood,wizPriorities,wizSummary][wizStep]();
+
+  const foot = document.getElementById('wiz-foot');
+  const last = wizStep === WIZ_STEPS.length-1;
+  foot.innerHTML = `
+    ${wizStep>0?`<button class="btn ghost" onclick="wizNav(-1)">BACK</button>`:`<button class="btn ghost" onclick="closeWizard()">CLOSE</button>`}
+    ${last?`<button class="btn primary" onclick="completeSetup()">COMPLETE SETUP</button>`
+      :`<button class="btn ghost" onclick="wizNav(1)">SKIP</button><button class="btn primary" onclick="wizNext()">NEXT</button>`}`;
+}
+function wizNav(d) { wizStep = Math.max(0,Math.min(WIZ_STEPS.length-1,wizStep+d)); save(); renderWizard(); }
+function wizNext() {
+  if (wizStep===0 && !S.income_sources.length) { alert('Add at least one income source.'); return; }
+  wizNav(1);
+}
+
+/* Step 1: income */
+function wizIncome() {
+  return S.income_sources.map(i=>`
+    <div class="card">
+      <div class="row-between"><input value="${esc(i.name)}" oninput="updWiz('income_sources','${i.id}','name',this.value)" placeholder="Source name" style="border:none;background:none;padding:0;font-family:var(--display);font-weight:700;font-size:16px">
+        <button class="btn sm danger" onclick="delWiz('income_sources','${i.id}')">×</button></div>
+      <div class="grid2" style="margin-top:8px">
+        <div><label class="fld">Amount</label><input type="number" value="${i.amount||''}" oninput="updWiz('income_sources','${i.id}','amount',this.value)"></div>
+        <div><label class="fld">Frequency</label><select onchange="updWiz('income_sources','${i.id}','frequency',this.value)">
+          ${['weekly','biweekly','monthly','irregular'].map(f=>`<option ${i.frequency===f?'selected':''}>${f}</option>`).join('')}</select></div>
+      </div>
+      <label class="fld">Next expected date</label><input type="date" value="${i.next_date?i.next_date.slice(0,10):''}" oninput="updWiz('income_sources','${i.id}','next_date',this.value?new Date(this.value).toISOString():null)">
+      <label class="fld">Reliability</label><select onchange="updWiz('income_sources','${i.id}','reliability',this.value)">
+        ${['guaranteed','likely','uncertain'].map(r=>`<option ${i.reliability===r?'selected':''}>${r}</option>`).join('')}</select>
+      <label class="fld">Notes</label><input value="${esc(i.notes||'')}" oninput="updWiz('income_sources','${i.id}','notes',this.value)">
+    </div>`).join('') +
+    `<button class="btn" style="margin-top:8px" onclick="addWiz('income_sources',{name:'',amount:0,frequency:'monthly',next_date:null,reliability:'likely',notes:''})">+ ADD INCOME</button>`;
+}
+
+/* Step 2: expenses */
+function wizExpense() {
+  return S.expense_categories.map(c=>`
+    <div class="card">
+      <div class="row-between"><input value="${esc(c.name)}" oninput="updWiz('expense_categories','${c.id}','name',this.value)" style="border:none;background:none;padding:0;font-family:var(--display);font-weight:700;font-size:16px">
+        <button class="btn sm danger" onclick="delWiz('expense_categories','${c.id}')">×</button></div>
+      <div class="grid2" style="margin-top:8px">
+        <div><label class="fld">Amount</label><input type="number" value="${c.budget||''}" oninput="updWiz('expense_categories','${c.id}','budget',this.value)"></div>
+        <div><label class="fld">Frequency</label><select onchange="updWiz('expense_categories','${c.id}','frequency',this.value)">
+          ${['daily','weekly','monthly'].map(f=>`<option ${c.frequency===f?'selected':''}>${f}</option>`).join('')}</select></div>
+      </div>
+      <div class="grid2">
+        <div><label class="fld">Day of month</label><input type="number" min="1" max="31" value="${c.due_day||''}" oninput="updWiz('expense_categories','${c.id}','due_day',this.value)"></div>
+        <div><label class="fld">Priority</label><select onchange="updWiz('expense_categories','${c.id}','priority',this.value)">
+          ${['critical','important','optional'].map(p=>`<option ${c.priority===p?'selected':''}>${p}</option>`).join('')}</select></div>
+      </div>
+    </div>`).join('') +
+    `<button class="btn" style="margin-top:8px" onclick="addWiz('expense_categories',{name:'New category',budget:0,frequency:'monthly',due_day:null,due_date:null,priority:'important',order:99})">+ ADD CATEGORY</button>`;
+}
+
+/* Step 3: savings */
+function wizSavings() {
+  return S.savings_goals.map(g=>`
+    <div class="card">
+      <div class="row-between"><input value="${esc(g.name)}" oninput="updWiz('savings_goals','${g.id}','name',this.value)" style="border:none;background:none;padding:0;font-family:var(--display);font-weight:700;font-size:16px">
+        <button class="btn sm danger" onclick="delWiz('savings_goals','${g.id}')">×</button></div>
+      <div class="grid2" style="margin-top:8px">
+        <div><label class="fld">Target</label><input type="number" value="${g.target||''}" oninput="updWiz('savings_goals','${g.id}','target',this.value)"></div>
+        <div><label class="fld">Current</label><input type="number" value="${g.current||''}" oninput="updWiz('savings_goals','${g.id}','current',this.value)"></div>
+      </div>
+      <div class="grid2">
+        <div><label class="fld">Monthly</label><input type="number" value="${g.monthly_contribution||''}" oninput="updWiz('savings_goals','${g.id}','monthly_contribution',this.value)"></div>
+        <div><label class="fld">Priority 1-5</label><input type="number" min="1" max="5" value="${g.priority||3}" oninput="updWiz('savings_goals','${g.id}','priority',this.value)"></div>
+      </div>
+      <label class="fld">Deadline</label><input type="date" value="${g.deadline?g.deadline.slice(0,10):''}" oninput="updWiz('savings_goals','${g.id}','deadline',this.value?new Date(this.value).toISOString():null)">
+      ${renderGoalCalc(g)}
+    </div>`).join('') +
+    `<button class="btn" style="margin-top:8px" onclick="addWiz('savings_goals',{name:'New goal',target:0,current:0,monthly_contribution:0,deadline:new Date(Date.now()+180*86400000).toISOString(),priority:3,paused:false})">+ ADD GOAL</button>`;
+}
+function renderGoalCalc(g) {
+  if (!g.deadline || !g.target) return '';
+  const ml = monthsBetween(todayISO(), g.deadline);
+  const req = Math.max(0,(Number(g.target)-Number(g.current))/ml);
+  const ok = (Number(g.monthly_contribution)||0) >= req;
+  return `<div class="tiny" style="margin-top:8px;color:${ok?'var(--green)':'var(--yellow)'}">
+    ${Math.round(ml)} months left · need ${ksh(req)}/mo · ${ok?'contribution sufficient':'increase contribution'}</div>`;
+}
+
+/* Step 4: food */
+function wizFood() {
+  return (S.food_database.length?S.food_database.map(f=>`
+    <div class="card">
+      <div class="row-between"><div style="font-family:var(--display);font-weight:700">${esc(f.name)}</div>
+        <div><span class="mono tiny">${ksh(f.price)}</span> <button class="btn sm danger" onclick="delWiz('food_database','${f.id}')">×</button></div></div>
+    </div>`).join(''):`<div class="empty-note">No foods yet.</div>`) +
+    `<button class="btn" style="margin-top:8px" onclick="closeWizard();switchTab('food');openFoodModal()">+ ADD FOOD ITEM</button>
+     <div class="tiny muted center" style="margin-top:8px">You can also manage foods anytime from the Food tab.</div>`;
+}
+
+/* Step 5: priorities */
+function wizPriorities() {
+  const labels = { survival:'Survival (food, shelter)', health:'Health', income:'Income generation', education:'Education', savings:'Savings', comfort:'Comfort', luxury:'Luxury' };
+  return `<div class="tiny muted" style="margin-bottom:8px">Use ↑ ↓ to reorder. Top = highest priority.</div>` +
+    S.priorities.map((p,i)=>`
+    <div class="card row-between">
+      <span><span class="green mono">${i+1}.</span> ${labels[p]||p}</span>
+      <span>
+        <button class="btn sm ghost" onclick="movePriority(${i},-1)" ${i===0?'disabled style=opacity:.3':''}>↑</button>
+        <button class="btn sm ghost" onclick="movePriority(${i},1)" ${i===S.priorities.length-1?'disabled style=opacity:.3':''}>↓</button>
+      </span>
+    </div>`).join('');
+}
+function movePriority(i, d) {
+  const j = i+d; if (j<0||j>=S.priorities.length) return;
+  [S.priorities[i],S.priorities[j]] = [S.priorities[j],S.priorities[i]];
+  save(); renderWizard();
+}
+
+/* Step 6: summary */
+function wizSummary() {
+  return `<div class="card">
+    <div class="kv"><span class="k">Income sources</span><span class="v">${S.income_sources.length} · ${ksh(monthlyIncome())}/mo</span></div>
+    <div class="kv"><span class="k">Expense categories</span><span class="v">${S.expense_categories.length} · ${ksh(monthlyExpenses())}/mo</span></div>
+    <div class="kv"><span class="k">Savings goals</span><span class="v">${S.savings_goals.length} · ${ksh(reservedSavings())}/mo</span></div>
+    <div class="kv"><span class="k">Food items</span><span class="v">${S.food_database.length}</span></div>
+    <div class="kv"><span class="k">Top priority</span><span class="v">${S.priorities[0]}</span></div>
+    <div class="kv" style="border-top:1px solid var(--border);margin-top:6px;padding-top:8px">
+      <span class="k" style="color:var(--text)">Net monthly</span>
+      <span class="v" style="color:${monthlyIncome()-monthlyExpenses()-reservedSavings()>=0?'var(--green)':'var(--red)'}">${ksh(monthlyIncome()-monthlyExpenses()-reservedSavings())}</span></div>
+  </div>
+  <label class="fld">Current cash on hand (KSh)</label>
+  <input id="wiz-cash" type="number" inputmode="numeric" value="${Number(S.cash_on_hand)||0}">`;
+}
+
+/* wizard data ops */
+function addWiz(arr, obj) { S[arr].push(Object.assign({id:uid()},obj)); save(); renderWizard(); }
+function delWiz(arr, id) { S[arr] = S[arr].filter(x=>x.id!==id); save(); renderWizard(); }
+function updWiz(arr, id, field, val) {
+  const o = S[arr].find(x=>x.id===id); if (!o) return;
+  if (['amount','budget','target','current','monthly_contribution','priority','due_day'].includes(field)) val = val===''||val==null?null:Number(val);
+  o[field] = val; save();
+  // live recalc for savings calc line — re-render only on blur-heavy fields would jump cursor; skip full rerender for text inputs
+}
+
+function completeSetup() {
+  const cashEl = document.getElementById('wiz-cash');
+  if (cashEl) { S.cash_on_hand = Number(cashEl.value)||0; }
+  if (!S.income_sources.length) { alert('Add at least one income source first.'); wizStep=0; renderWizard(); return; }
+  S.setup_complete = true;
+  S.last_updated = new Date().toISOString();
+  save();
+  document.getElementById('wizard').classList.remove('open');
+  renderAll();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   FOOD SORT WIRING
+═══════════════════════════════════════════════════════════════════ */
+document.getElementById('food-sort').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  foodSort = b.dataset.sort;
+  document.querySelectorAll('#food-sort button').forEach(x=>x.classList.toggle('on', x===b));
+  renderFood();
+});
+
+/* ══════════════════════════════════════════════════════════════════
+   SERVICE WORKER + BOOT
+═══════════════════════════════════════════════════════════════════ */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(()=>{});
+}
+
+renderAll();
+if (!S.setup_complete) {
+  setTimeout(() => openWizard(0), 350);
+}
+</script>
+</body>
+</html>
