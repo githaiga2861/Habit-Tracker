@@ -1,5 +1,5 @@
-const CACHE_NAME = 'discipline-v2';
-const ASSETS = ['./'];
+const CACHE_NAME = 'discipline-v3';
+const ASSETS = ['./', './index.html', './finance.html'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
