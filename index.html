@@ -532,6 +532,144 @@
     margin-top: 14px; letter-spacing: 1px; line-height: 1.6;
   }
 
+  /* ── TRIGGER WARNING ── */
+  #trigger-section {
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+  }
+  #trigger-banner {
+    display: none;
+    padding: 12px 20px;
+    background: #1a0000;
+    border-bottom: 2px solid var(--red);
+    animation: pulse-red 2s ease-in-out infinite;
+  }
+  #trigger-banner.visible { display: block; }
+  @keyframes pulse-red {
+    0%, 100% { border-color: var(--red); }
+    50% { border-color: var(--red-dim); }
+  }
+  #trigger-banner-label {
+    font-family: var(--display); font-weight: 900;
+    font-size: 13px; letter-spacing: 4px; color: var(--red);
+    text-transform: uppercase; margin-bottom: 4px;
+  }
+  #trigger-banner-msg {
+    font-size: 11px; font-weight: 600; color: #cc4444;
+    letter-spacing: 1px; line-height: 1.5;
+  }
+  #trigger-questions {
+    padding: 16px 20px;
+  }
+  #trigger-q-label {
+    font-family: var(--display); font-weight: 700;
+    font-size: 15px; letter-spacing: 4px;
+    text-transform: uppercase; color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+  .trigger-q-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .trigger-q-row:last-of-type { border-bottom: none; }
+  .trigger-q-text {
+    font-family: var(--display); font-weight: 600;
+    font-size: 15px; color: var(--text); letter-spacing: 0.5px;
+  }
+  .trigger-q-sub { font-size: 11px; font-weight: 600; color: var(--text-muted); letter-spacing: 1px; margin-top: 2px; }
+  .trigger-toggle {
+    width: 44px; height: 26px; border-radius: 13px;
+    background: var(--border2); border: none; cursor: pointer;
+    position: relative; transition: background 0.2s; flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .trigger-toggle::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--text-muted); transition: all 0.2s;
+  }
+  .trigger-toggle.on { background: var(--red); }
+  .trigger-toggle.on::after { left: 21px; background: #fff; }
+
+  /* ── RISK CONFIRM MODAL ── */
+  #risk-modal {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.92); z-index: 500;
+    align-items: flex-end; justify-content: center;
+  }
+  #risk-modal.open { display: flex; }
+  #risk-modal-box {
+    background: #0d0000; border: 1px solid var(--red);
+    border-bottom: none; width: 100%; max-width: 480px;
+    padding: 28px 24px 40px;
+  }
+  #risk-modal-title {
+    font-family: var(--display); font-weight: 900;
+    font-size: 20px; letter-spacing: 3px; color: var(--red);
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  #risk-modal-msg {
+    font-size: 13px; font-weight: 600; color: #cc4444;
+    line-height: 1.7; letter-spacing: 0.5px; margin-bottom: 24px;
+  }
+  #risk-modal-btns { display: flex; gap: 12px; }
+  #risk-confirm-yes {
+    flex: 1; padding: 16px; background: var(--green);
+    border: none; color: #000; font-family: var(--display);
+    font-weight: 900; font-size: 16px; letter-spacing: 3px;
+    text-transform: uppercase; cursor: pointer;
+  }
+  #risk-confirm-no {
+    flex: 1; padding: 16px; background: transparent;
+    border: 1px solid var(--red-dim); color: var(--red);
+    font-family: var(--display); font-weight: 700;
+    font-size: 16px; letter-spacing: 3px;
+    text-transform: uppercase; cursor: pointer;
+  }
+
+  /* ── WEEKLY REVIEW ── */
+  #weekly-section {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  #weekly-title {
+    font-family: var(--display); font-weight: 700;
+    font-size: 15px; letter-spacing: 4px;
+    text-transform: uppercase; color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+  #weekly-verdict {
+    font-family: var(--display); font-weight: 900;
+    font-size: clamp(28px, 8vw, 40px); line-height: 1;
+    margin-bottom: 16px; letter-spacing: 1px;
+  }
+  #weekly-verdict.green { color: var(--green); }
+  #weekly-verdict.yellow { color: var(--yellow); }
+  #weekly-verdict.red { color: var(--red); }
+  .weekly-stat {
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .weekly-stat:last-child { border-bottom: none; }
+  .weekly-stat-label {
+    font-size: 12px; font-weight: 600; color: var(--text-dim);
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .weekly-stat-val {
+    font-family: var(--display); font-weight: 900;
+    font-size: 20px; color: var(--text);
+  }
+  .weekly-stat-val.green { color: var(--green); }
+  .weekly-stat-val.red { color: var(--red); }
+  .weekly-stat-val.yellow { color: var(--yellow); }
+  #weekly-sentence {
+    margin-top: 14px; padding: 12px 14px;
+    border-left: 2px solid var(--text-muted);
+    font-size: 13px; font-weight: 600;
+    color: var(--text-dim); line-height: 1.7;
+    letter-spacing: 0.5px;
+  }
+
   @media (max-width: 340px) {
     #life-score-number { font-size: 64px; }
     .streak-number { font-size: 36px; }
@@ -627,6 +765,46 @@
   <button id="log-btn" onclick="logToday()">LOG TODAY</button>
 </div>
 
+<!-- TRIGGER WARNING -->
+<div id="trigger-section">
+  <div id="trigger-banner">
+    <div id="trigger-banner-label">⚠ HIGH RISK DAY</div>
+    <div id="trigger-banner-msg"></div>
+  </div>
+  <div id="trigger-questions">
+    <div id="trigger-q-label">Morning Risk Check</div>
+    <div class="trigger-q-row">
+      <div>
+        <div class="trigger-q-text">Do you have money today?</div>
+        <div class="trigger-q-sub">Cash or easy access — triggers impulse spending + substances</div>
+      </div>
+      <button class="trigger-toggle" id="trigger-money" onclick="toggleTrigger('money')"></button>
+    </div>
+    <div class="trigger-q-row">
+      <div>
+        <div class="trigger-q-text">Are you meeting friends?</div>
+        <div class="trigger-q-sub">Social pressure — drinking and nicotine risk spikes</div>
+      </div>
+      <button class="trigger-toggle" id="trigger-friends" onclick="toggleTrigger('friends')"></button>
+    </div>
+    <div class="trigger-q-row">
+      <div>
+        <div class="trigger-q-text">Are you bored / idle today?</div>
+        <div class="trigger-q-sub">Unstructured time — dopamine seeking and binge watching risk</div>
+      </div>
+      <button class="trigger-toggle" id="trigger-boredom" onclick="toggleTrigger('boredom')"></button>
+    </div>
+  </div>
+</div>
+
+<!-- WEEKLY REVIEW -->
+<div id="weekly-section">
+  <div id="weekly-title">Weekly Verdict</div>
+  <div id="weekly-verdict" class="green">—</div>
+  <div id="weekly-stats"></div>
+  <div id="weekly-sentence"></div>
+</div>
+
 <!-- MONTHLY CALENDAR -->
 <div id="monthly-section">
   <div id="monthly-title">Monthly View</div>
@@ -674,6 +852,18 @@
 <!-- RESET -->
 <div id="reset-zone">
   <button id="reset-btn" onclick="confirmReset()">RESET ALL DATA</button>
+</div>
+
+<!-- RISK CONFIRM MODAL -->
+<div id="risk-modal">
+  <div id="risk-modal-box">
+    <div id="risk-modal-title">⚠ HIGH RISK DAY</div>
+    <div id="risk-modal-msg"></div>
+    <div id="risk-modal-btns">
+      <button id="risk-confirm-yes" onclick="confirmRiskLog()">YES, I STAYED CLEAN</button>
+      <button id="risk-confirm-no" onclick="closeRiskModal()">GO BACK</button>
+    </div>
+  </div>
 </div>
 
 <!-- TOAST -->
@@ -945,8 +1135,44 @@ document.getElementById('growth-note').addEventListener('input', function() {
   saveState();
 });
 
-// ─── LOG TODAY ───────────────────────────────────────────────────────────────
+// ─── LOG TODAY (risk-aware) ───────────────────────────────────────────────────
+let pendingRiskLog = false;
+
 function logToday() {
+  const day = currentDay();
+  const triggers = day.triggers || {};
+  const isHighRisk = triggers.money || triggers.friends || triggers.boredom;
+
+  // If high risk day and any dopamine or sober habit is marked clean — confirm
+  const soberClean = day.habits['sober'] === true;
+  const dopamineClean = DOPAMINE_HABITS.some(h => day.dopamine && day.dopamine[h.id] === true);
+
+  if (isHighRisk && (soberClean || dopamineClean)) {
+    const riskFlags = [
+      triggers.money   ? 'money' : null,
+      triggers.friends ? 'friends around' : null,
+      triggers.boredom ? 'idle time' : null,
+    ].filter(Boolean).join(', ');
+    document.getElementById('risk-modal-msg').textContent =
+      `You flagged ${riskFlags} today. You're logging clean habits on a high-risk day. Are you being completely honest with yourself? This is between you and the data.`;
+    document.getElementById('risk-modal').classList.add('open');
+    pendingRiskLog = true;
+    return;
+  }
+  commitLog();
+}
+
+function confirmRiskLog() {
+  closeRiskModal();
+  commitLog();
+}
+
+function closeRiskModal() {
+  document.getElementById('risk-modal').classList.remove('open');
+  pendingRiskLog = false;
+}
+
+function commitLog() {
   const day = currentDay();
   const allDone = HABITS.filter(h => day.habits[h.id] === true).length;
   const pct = Math.round((allDone / HABITS.length) * 100);
@@ -962,6 +1188,182 @@ function logToday() {
 
   renderAll();
   toast(`Day logged: ${allDone}/${HABITS.length} = ${pct}%`);
+}
+
+// ─── TRIGGER WARNING ──────────────────────────────────────────────────────────
+function loadTriggers() {
+  const day = currentDay();
+  return day.triggers || {};
+}
+
+function saveTriggers(triggers) {
+  const day = currentDay();
+  day.triggers = triggers;
+  state[todayKey()] = day;
+  saveState();
+}
+
+function toggleTrigger(key) {
+  const triggers = loadTriggers();
+  triggers[key] = !triggers[key];
+  saveTriggers(triggers);
+  renderTriggers();
+  // Fire risk notifications if SW active
+  if (triggers[key]) scheduleTriggerNotifs();
+}
+
+function renderTriggers() {
+  const triggers = loadTriggers();
+  ['money','friends','boredom'].forEach(k => {
+    const btn = document.getElementById(`trigger-${k}`);
+    if (btn) btn.className = `trigger-toggle${triggers[k] ? ' on' : ''}`;
+  });
+
+  const isHighRisk = triggers.money || triggers.friends || triggers.boredom;
+  const banner = document.getElementById('trigger-banner');
+  const msg = document.getElementById('trigger-banner-msg');
+
+  if (isHighRisk) {
+    const flags = [
+      triggers.money   ? '💰 Money' : null,
+      triggers.friends ? '👥 Friends' : null,
+      triggers.boredom ? '😐 Idle' : null,
+    ].filter(Boolean).join(' · ');
+    msg.textContent = `${flags} — Stay locked. Every decision today is a vote.`;
+    banner.classList.add('visible');
+  } else {
+    banner.classList.remove('visible');
+  }
+}
+
+function scheduleTriggerNotifs() {
+  if (!swReg || !swReg.active) return;
+  const triggers = loadTriggers();
+  if (!triggers.money && !triggers.friends && !triggers.boredom) return;
+
+  // Send 3 spaced high-risk notifications to SW
+  const now = new Date();
+  const schedules = [];
+
+  const windows = [
+    { hour: 10, min: 0,  msg: '⚠ High risk day. You flagged the risks this morning. Stay sharp.' },
+    { hour: 16, min: 0,  msg: '⚠ Still a high risk day. Don\'t make a decision you\'ll log in red tonight.' },
+    { hour: 19, min: 0,  msg: '⚠ This is the hour. You know what\'s coming. You already decided — did you?' },
+  ];
+
+  windows.forEach((w, i) => {
+    const t = new Date(); t.setHours(w.hour, w.min, 0, 0);
+    if (t > now) schedules.push({ key: `risk_${i}`, hour: w.hour, min: w.min, msg: w.msg, once: true });
+  });
+
+  if (schedules.length > 0) {
+    swReg.active.postMessage({ type: 'SCHEDULE_ONCE', schedules });
+  }
+}
+
+// ─── STREAK PROTECTION ALERT ─────────────────────────────────────────────────
+function scheduleStreakProtection() {
+  if (!swReg || !swReg.active) return;
+  const { discStreak } = computeStreaks();
+  if (discStreak === 0) return; // no streak to protect
+
+  swReg.active.postMessage({
+    type: 'STREAK_GUARD',
+    streak: discStreak,
+    hour: 20, min: 0,
+    msg: `You haven't logged today. Your ${discStreak}-day streak ends in 4 hours. Don't break it.`
+  });
+}
+
+// ─── WEEKLY REVIEW ───────────────────────────────────────────────────────────
+function renderWeeklyReview() {
+  const now = new Date();
+  const days = [];
+
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const k = fmtDate(d);
+    days.push({ k, day: state[k] || null });
+  }
+
+  const logged = days.filter(d => d.day && d.day.pct !== null && d.day.pct !== undefined);
+  const won = logged.filter(d => d.day.pct >= THRESHOLD_WIN).length;
+  const total = logged.length;
+
+  // Verdict
+  const verdictEl = document.getElementById('weekly-verdict');
+  if (total === 0) {
+    verdictEl.textContent = 'NO DATA YET';
+    verdictEl.className = 'weekly-verdict';
+    document.getElementById('weekly-stats').innerHTML = '';
+    document.getElementById('weekly-sentence').textContent = 'Start logging daily. Come back Sunday.';
+    return;
+  }
+
+  const winPct = Math.round((won / 7) * 100);
+  if (winPct >= 80) { verdictEl.textContent = `${won}/7 DAYS WON`; verdictEl.className = 'weekly-verdict green'; }
+  else if (winPct >= 57) { verdictEl.textContent = `${won}/7 DAYS WON`; verdictEl.className = 'weekly-verdict yellow'; }
+  else { verdictEl.textContent = `${won}/7 DAYS WON`; verdictEl.className = 'weekly-verdict red'; }
+
+  // Per-habit breakdown
+  const habitFails = {};
+  HABITS.forEach(h => { habitFails[h.id] = 0; });
+  days.forEach(({ day }) => {
+    if (!day) return;
+    HABITS.forEach(h => { if (day.habits && day.habits[h.id] === false) habitFails[h.id]++; });
+  });
+
+  const dopamineFails = {};
+  DOPAMINE_HABITS.forEach(h => { dopamineFails[h.id] = 0; });
+  days.forEach(({ day }) => {
+    if (!day || !day.dopamine) return;
+    DOPAMINE_HABITS.forEach(h => { if (day.dopamine[h.id] === false) dopamineFails[h.id]++; });
+  });
+
+  // Worst habit
+  const worstHabit = Object.entries(habitFails).sort((a,b) => b[1]-a[1])[0];
+  const worstDopamine = Object.entries(dopamineFails).sort((a,b) => b[1]-a[1])[0];
+  const worstHabitName = HABITS.find(h => h.id === worstHabit[0])?.name || '';
+  const worstDopamineName = DOPAMINE_HABITS.find(h => h.id === worstDopamine[0])?.name || '';
+
+  const sleepFails = days.filter(d => d.day && d.day.habits && d.day.habits['sleep'] === false).length;
+
+  const statsEl = document.getElementById('weekly-stats');
+  statsEl.innerHTML = `
+    <div class="weekly-stat">
+      <div class="weekly-stat-label">Days Logged</div>
+      <div class="weekly-stat-val ${total >= 5 ? 'green' : 'yellow'}">${total} / 7</div>
+    </div>
+    <div class="weekly-stat">
+      <div class="weekly-stat-label">Days Won (80%+)</div>
+      <div class="weekly-stat-val ${won >= 5 ? 'green' : won >= 3 ? 'yellow' : 'red'}">${won} / 7</div>
+    </div>
+    <div class="weekly-stat">
+      <div class="weekly-stat-label">Sleep Failed</div>
+      <div class="weekly-stat-val ${sleepFails === 0 ? 'green' : sleepFails <= 2 ? 'yellow' : 'red'}">${sleepFails}x</div>
+    </div>
+    <div class="weekly-stat">
+      <div class="weekly-stat-label">Weakest Habit</div>
+      <div class="weekly-stat-val ${worstHabit[1] === 0 ? 'green' : 'red'}">${worstHabit[1] === 0 ? 'NONE' : worstHabitName}</div>
+    </div>
+    <div class="weekly-stat">
+      <div class="weekly-stat-label">Dopamine Weak Point</div>
+      <div class="weekly-stat-val ${worstDopamine[1] === 0 ? 'green' : 'red'}">${worstDopamine[1] === 0 ? 'CLEAN' : worstDopamineName}</div>
+    </div>
+  `;
+
+  // Brutal sentence verdict
+  const sentenceEl = document.getElementById('weekly-sentence');
+  let sentence = '';
+  if (won === 7) sentence = 'Perfect week. Every single day. That\'s not luck — that\'s who you\'re becoming.';
+  else if (won >= 5) sentence = `Strong week. ${7-won} day${7-won>1?'s':''} slipped. You know which one${7-won>1?'s':''} and why.`;
+  else if (won >= 3) sentence = `Average week. You won half. The other half — that\'s the gap between who you are and who you want to be.`;
+  else if (won >= 1) sentence = `Rough week. Only ${won} day${won>1?'s':''} won. The data doesn\'t lie. What are you avoiding?`;
+  else sentence = 'Zero days won this week. Something is wrong. Be honest — is it the habits or the logging?';
+
+  if (sleepFails >= 4) sentence += ' Sleep is your biggest vulnerability right now — everything else suffers because of it.';
+  sentenceEl.textContent = sentence;
 }
 
 // ─── STREAKS ─────────────────────────────────────────────────────────────────
@@ -1356,6 +1758,8 @@ function renderAll() {
   renderHabits();
   renderDopamine();
   renderGrowth();
+  renderTriggers();
+  renderWeeklyReview();
   renderStreaks();
   renderLifeScore();
   renderCalendar();
@@ -1366,7 +1770,7 @@ function renderAll() {
 quoteIndex = getDailyQuoteIndex();
 renderQuote();
 renderAll();
-initNotifications();
+initNotifications().then(() => scheduleStreakProtection());
 
 // Auto-save note on blur
 document.getElementById('growth-note').addEventListener('blur', function() {
